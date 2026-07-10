@@ -94,18 +94,30 @@ async function start() {
     slider.value = reveal * 100;
   });
 
-  // --- Toque sobre hotspots (raycasting) ---
-  const ray = new THREE.Raycaster();
-  const ptr = new THREE.Vector2();
-  renderer.domElement.addEventListener("pointerdown", (ev) => {
+  // --- Toque sobre hotspots (proyección a pantalla + distancia; robusto en iOS) ---
+  const _wp = new THREE.Vector3();
+  function handleTap(clientX, clientY, target) {
     if (!visible) return;
-    const r = renderer.domElement.getBoundingClientRect();
-    ptr.x = ((ev.clientX - r.left) / r.width) * 2 - 1;
-    ptr.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
-    ray.setFromCamera(ptr, camera);
-    const hit = ray.intersectObjects(hitMeshes, false)[0];
-    if (hit) openCard(hit.object.userData.idx);
-  });
+    // ignorar toques sobre la UI (panel, tarjeta, barra)
+    if (target && target.closest && target.closest("#panel, #card, #topbar")) return;
+    let best = -1, bestD = Infinity;
+    hitMeshes.forEach((m) => {
+      m.getWorldPosition(_wp);
+      _wp.project(camera);                 // -> NDC
+      if (_wp.z > 1) return;               // detrás de cámara
+      const sx = (_wp.x * 0.5 + 0.5) * window.innerWidth;
+      const sy = (-_wp.y * 0.5 + 0.5) * window.innerHeight;
+      const d = Math.hypot(sx - clientX, sy - clientY);
+      if (d < bestD) { bestD = d; best = m.userData.idx; }
+    });
+    const thresh = Math.min(window.innerWidth, window.innerHeight) * 0.13;
+    if (best >= 0 && bestD < thresh) openCard(best);
+  }
+  window.addEventListener("pointerdown", (e) => handleTap(e.clientX, e.clientY, e.target));
+  window.addEventListener("touchstart", (e) => {
+    const t = e.touches && e.touches[0];
+    if (t) handleTap(t.clientX, t.clientY, e.target);
+  }, { passive: true });
 
   function openCard(i) {
     const h = CFG.hotspots[i];
