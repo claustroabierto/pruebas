@@ -1,6 +1,7 @@
 /*  CONFIG DE PIEZA — cristales (vidrio de uranio)
  *  Toggle antes/después: al deslizar, el candelabro real "se enciende" en verde
- *  como bajo luz UV (overlay UV alineado sobre la pieza, fondo transparente).
+ *  (overlay UV sobre la pieza) y al costado aparecen las burbujas comparativas
+ *  del cristal de uranio SIN / CON luz UV.
  */
 window.MUSEO_CONFIG = {
   id: "cristales",
@@ -11,7 +12,7 @@ window.MUSEO_CONFIG = {
   targetSrc: "assets/targets.mind",
   targetPreview: "assets/target.jpg",
 
-  // Candelabro UV (verde), alineado sobre la silueta de la pieza rastreada.
+  // Candelabro UV (verde) alineado sobre la pieza rastreada.
   overlay: {
     src: "assets/overlay.png",
     width: 0.814,
@@ -19,6 +20,12 @@ window.MUSEO_CONFIG = {
     offsetX: -0.054,
     offsetY: -0.040
   },
+
+  // Burbujas comparativas al costado (cristal de uranio sin/con luz UV).
+  extras: [
+    { src: "assets/sinuv.png", width: 0.52, height: 0.88, offsetX: 0.95, offsetY: 0.50 },
+    { src: "assets/conuv.png", width: 0.52, height: 0.82, offsetX: 0.95, offsetY: -0.48 }
+  ],
 
   hotspots: [
     { x: 0.50, y: 0.50, color: "#39ff14", titulo: "Vidrio de uranio",

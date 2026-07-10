@@ -49,14 +49,21 @@ async function start() {
   const anchor = mindar.addAnchor(0);
   const loader = new THREE.TextureLoader();
 
-  // --- Overlay de características flotantes ---
+  // --- Capas de overlay (la principal + extras opcionales) ---
+  const fadeMats = []; // todos los materiales que aparecen con el revelado
+  function addLayer(cfg, z) {
+    const tex = loader.load(cfg.src);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0 });
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(cfg.width, cfg.height), mat);
+    mesh.position.set(cfg.offsetX, cfg.offsetY, z);
+    anchor.group.add(mesh);
+    fadeMats.push(mat);
+    return mesh;
+  }
   const ov = CFG.overlay;
-  const ovTex = loader.load(ov.src);
-  ovTex.colorSpace = THREE.SRGBColorSpace;
-  const overlayMat = new THREE.MeshBasicMaterial({ map: ovTex, transparent: true, opacity: 0 });
-  const overlay = new THREE.Mesh(new THREE.PlaneGeometry(ov.width, ov.height), overlayMat);
-  overlay.position.set(ov.offsetX, ov.offsetY, 0.001);
-  anchor.group.add(overlay);
+  addLayer(ov, 0.001);
+  (CFG.extras || []).forEach((ex, i) => addLayer(ex, 0.002 + i * 0.001));
 
   // --- Hotspots (anillo visual + disco invisible de toque, más grande) ---
   const hotMeshes = [];  // aros visuales (pulsan)
@@ -148,8 +155,8 @@ async function start() {
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
     const t = clock.getElapsedTime();
-    // fade del overlay según revelado
-    overlayMat.opacity += (reveal - overlayMat.opacity) * 0.15;
+    // fade de todas las capas según revelado
+    fadeMats.forEach((m) => { m.opacity += (reveal - m.opacity) * 0.15; });
     // pulso de los anillos, escalado por revelado
     hotMeshes.forEach((m) => {
       const pulse = 1 + Math.sin(t * 3 + m.userData.idx) * 0.12;
