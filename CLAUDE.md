@@ -24,7 +24,7 @@ museo-ar/
   shared/
     ar-engine.js       motor único: carga MindAR, dibuja overlay + extras + hotspots
     styles.css
-  <pieza>/             una carpeta por pieza, ej: inmaculada/, escapulario/, candelabros/
+  <pieza>/             una carpeta por pieza, ej: Inmaculada_Concepción/, escapulario/, candelabros/
     index.html         boilerplate que carga shared/ar-engine.js + su config.js
     config.js          window.MUSEO_CONFIG = {...} — todo lo específico de la pieza
     assets/
@@ -38,7 +38,7 @@ museo-ar/
 
 ## Añadir una pieza nueva
 
-1. `cp -r inmaculada NUEVA` (o `escapulario`, el que tenga el layout más parecido)
+1. `cp -r Inmaculada_Concepción NUEVA` (o `escapulario`, el que tenga el layout más parecido)
 2. Reemplaza `NUEVA/assets/target.jpg` por la imagen de la pieza nueva
 3. Compila el tracking: `cd tools/mind-compiler && node compile.mjs ../../NUEVA/assets/target.jpg ../../NUEVA/assets/targets.mind`
 4. Edita `NUEVA/config.js`: `titulo`, `overlay` (width/height/offsetX/offsetY — unidades MindAR, ancho de la pieza real = 1), `hotspots[]` (coords normalizadas 0..1 sobre el overlay), `extras[]` si hay paneles adicionales al costado
@@ -47,7 +47,7 @@ museo-ar/
 
 ## Layouts de overlay (varían por pieza — decidir cuál aplica a cada una nueva)
 
-- **Etiquetas alrededor** (inmaculada): overlay transparente, sin la pieza dibujada, con hotspots que apuntan a zonas de la pintura real.
+- **Etiquetas alrededor** (Inmaculada_Concepción): overlay transparente, sin la pieza dibujada, con hotspots que apuntan a zonas de la pintura real.
 - **Panel al costado** (escapulario): el overlay trae la pieza + rayos X posicionados para calzar SOBRE la obra real, y paneles extra (microscopía, tablas) quedan al costado, fuera del área rastreada.
 - **Toggle antes/después** (candelabros): overlay principal alineado sobre la pieza (ej. fluorescencia UV) + `extras[]` con comparativas sin/con efecto.
 - **Crossfade** (piezas sin asset transparente, solo ORIGINAL+ANALISIS compuestos): mezclar con shader/opacidad en vez de superponer capas.

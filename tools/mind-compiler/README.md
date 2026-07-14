@@ -20,7 +20,7 @@ node compile.mjs <imagen_target.jpg> <salida/targets.mind>
 Ejemplo real:
 
 ```bash
-node compile.mjs ../../inmaculada/assets/target.jpg ../../inmaculada/assets/targets.mind
+node compile.mjs ../../Inmaculada_Concepción/assets/target.jpg ../../Inmaculada_Concepción/assets/targets.mind
 ```
 
 La imagen debe ser el target plano de la pieza (buen contraste y detalle;

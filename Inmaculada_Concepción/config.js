@@ -1,4 +1,4 @@
-/*  CONFIG DE PIEZA — inmaculada
+/*  CONFIG DE PIEZA — Inmaculada_Concepción
  *  Este es el ÚNICO archivo que cambia por pieza. El motor (shared/ar-engine.js)
  *  es el mismo para todas. Copia esta carpeta, cambia el config y los assets.
  *
@@ -6,7 +6,7 @@
  *  (x: 0=izq,1=der ; y: 0=arriba,1=abajo). Fáciles de reajustar a ojo.
  */
 window.MUSEO_CONFIG = {
-  id: "inmaculada",
+  id: "Inmaculada_Concepción",
   titulo: "La Inmaculada Concepción",
   subtitulo: "Microscopía y materialidad · pigmentos",
   ficha: "Óleo sobre lienzo · Escuela colonial · Análisis científico de pigmentos",
