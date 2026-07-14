@@ -1,10 +1,10 @@
-/*  CONFIG DE PIEZA — cristales (vidrio de uranio)
+/*  CONFIG DE PIEZA — candelabros (vidrio de uranio)
  *  Toggle antes/después: al deslizar, el candelabro real "se enciende" en verde
  *  (overlay UV sobre la pieza) y al costado aparecen las burbujas comparativas
  *  del cristal de uranio SIN / CON luz UV.
  */
 window.MUSEO_CONFIG = {
-  id: "cristales",
+  id: "candelabros",
   titulo: "Candelabro de vidrio de uranio",
   subtitulo: "Fluorescencia bajo luz ultravioleta",
   ficha: "Vidrio con contenido de uranio · fluoresce verde bajo radiación UV",

@@ -24,7 +24,7 @@ museo-ar/
   shared/
     ar-engine.js       motor único: carga MindAR, dibuja overlay + extras + hotspots
     styles.css
-  <pieza>/             una carpeta por pieza, ej: inmaculada/, escapulario/, cristales/
+  <pieza>/             una carpeta por pieza, ej: inmaculada/, escapulario/, candelabros/
     index.html         boilerplate que carga shared/ar-engine.js + su config.js
     config.js          window.MUSEO_CONFIG = {...} — todo lo específico de la pieza
     assets/
@@ -49,7 +49,7 @@ museo-ar/
 
 - **Etiquetas alrededor** (inmaculada): overlay transparente, sin la pieza dibujada, con hotspots que apuntan a zonas de la pintura real.
 - **Panel al costado** (escapulario): el overlay trae la pieza + rayos X posicionados para calzar SOBRE la obra real, y paneles extra (microscopía, tablas) quedan al costado, fuera del área rastreada.
-- **Toggle antes/después** (cristales): overlay principal alineado sobre la pieza (ej. fluorescencia UV) + `extras[]` con comparativas sin/con efecto.
+- **Toggle antes/después** (candelabros): overlay principal alineado sobre la pieza (ej. fluorescencia UV) + `extras[]` con comparativas sin/con efecto.
 - **Crossfade** (piezas sin asset transparente, solo ORIGINAL+ANALISIS compuestos): mezclar con shader/opacidad en vez de superponer capas.
 
 Regla aprendida: si el proveedor de assets ya entrega una capa transparente
