@@ -50,13 +50,16 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hi
    pieza, así que lleva la portada de la muestra y los créditos, no un "Cargando".
    Los dos motores (ar-engine y pantalla-engine) la ocultan con `display:none`,
    así que esto es solo CSS + markup: no se toca JS. */
+/* Centro + créditos van agrupados, no anclados a los bordes: en un celular
+   (390px) separarlos dejaba ~500px muertos entre medio y los logos se leían
+   como un pie de página huérfano en vez de parte de la portada. */
 #loading{position:fixed;inset:0;z-index:9;
-  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
-  gap:20px;padding:calc(30px + env(safe-area-inset-top)) 20px calc(22px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:30px;padding:calc(30px + env(safe-area-inset-top)) 20px calc(22px + env(safe-area-inset-bottom));
   background:radial-gradient(115% 80% at 50% 32%, #241d33 0%, var(--bg) 72%);
   text-align:center;}
 
-#loading .centro{margin:auto;display:flex;flex-direction:column;align-items:center;gap:12px;
+#loading .centro{display:flex;flex-direction:column;align-items:center;gap:12px;
   max-width:330px;}
 #loading .sello{width:54px;height:54px;border-radius:50%;
   border:1px solid #c9a24b55;display:flex;align-items:center;justify-content:center;
