@@ -15,7 +15,7 @@ window.MUSEO_CONFIG = {
   // El asset completo (rayos X izq + microscopía der). Posicionado para que el
   // rayos X quede sobre la pieza rastreada (pieza = ancho 1).
   overlay: {
-    src: "assets/overlay.png",
+    src: "assets/overlay.webp",
     width: 2.082,
     height: 2.076,
     offsetX: 0.566,   // corre el asset a la derecha -> rayos X sobre la pieza, globitos al costado

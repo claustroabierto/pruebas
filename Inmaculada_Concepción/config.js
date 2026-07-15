@@ -19,7 +19,7 @@ window.MUSEO_CONFIG = {
   // La pintura rastreada mide 1 (ancho) x 1.412 (alto).
   // El overlay 850x850 contiene la pintura en un rect de 537px de ancho.
   overlay: {
-    src: "assets/overlay.png",
+    src: "assets/overlay.webp",
     width: 1.583,   // 850/537
     height: 1.583,  // overlay cuadrado
     offsetX: 0.012, // centro overlay vs centro pintura

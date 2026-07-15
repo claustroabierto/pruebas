@@ -14,7 +14,7 @@ window.MUSEO_CONFIG = {
 
   // Candelabro UV (verde) alineado sobre la pieza rastreada.
   overlay: {
-    src: "assets/overlay.png",
+    src: "assets/overlay.webp",
     width: 0.814,
     height: 1.666,
     offsetX: -0.054,
@@ -23,8 +23,8 @@ window.MUSEO_CONFIG = {
 
   // Burbujas comparativas al costado (cristal de uranio sin/con luz UV).
   extras: [
-    { src: "assets/sinuv.png", width: 0.52, height: 0.88, offsetX: 0.95, offsetY: 0.50 },
-    { src: "assets/conuv.png", width: 0.52, height: 0.82, offsetX: 0.95, offsetY: -0.48 }
+    { src: "assets/sinuv.webp", width: 0.52, height: 0.88, offsetX: 0.95, offsetY: 0.50 },
+    { src: "assets/conuv.webp", width: 0.52, height: 0.82, offsetX: 0.95, offsetY: -0.48 }
   ],
 
   hotspots: [
