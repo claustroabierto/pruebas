@@ -80,19 +80,33 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hi
 #loading .estado{font-size:11px;opacity:.5;letter-spacing:.3px;}
 
 /* Créditos: los logos son oscuros y van sobre placa clara, si no desaparecen
-   contra el fondo (UTEC y la Embajada son casi negros). */
-#loading .creditos{display:flex;align-items:center;justify-content:center;
+   contra el fondo (UTEC y la Embajada son casi negros).
+   La placa se usa en dos estados — la portada de carga y el escaneo, donde el
+   visitante pasa mucho más tiempo que en la carga — así que los estilos son
+   compartidos y cada estado solo decide dónde la coloca. El motor clona el
+   nodo a #scan; ver ar-engine.js. */
+.creditos{display:flex;align-items:center;justify-content:center;
   gap:clamp(10px, 4vw, 18px);
   background:#f4efe6;border-radius:13px;padding:11px clamp(12px, 4.5vw, 18px);
   box-shadow:0 6px 22px #0008;max-width:100%;}
-#loading .creditos img{display:block;width:auto;flex:0 0 auto;}
-#loading .creditos .l-carmelitas{height:clamp(36px, 11vw, 44px);}
-#loading .creditos .l-utec{height:clamp(20px, 6.2vw, 25px);}
-#loading .creditos .l-embajada{height:clamp(19px, 5.8vw, 23px);}
+.creditos img{display:block;width:auto;flex:0 0 auto;}
+.creditos .l-carmelitas{height:clamp(36px, 11vw, 44px);}
+.creditos .l-utec{height:clamp(20px, 6.2vw, 25px);}
+.creditos .l-embajada{height:clamp(19px, 5.8vw, 23px);}
+
+/* En el escaneo va anclada al pie: centrada competiría con el marco de
+   encuadre, que es lo que el visitante tiene que mirar. Se va sola al detectar
+   la obra porque #scan entero pasa a display:none. */
+#scan .creditos{position:absolute;left:50%;transform:translateX(-50%);
+  bottom:calc(18px + env(safe-area-inset-bottom));}
 
 @media (max-height:560px){
   #loading .expo{font-size:16px;}
   #loading .sello{display:none;}
+  /* En pantalla baja (celular acostado) el marco de encuadre ya ocupa casi
+     todo el alto: la placa terminaba tapando el "Apunta la cámara…", que es
+     la única instrucción de uso. Los créditos ceden, la instrucción no. */
+  #scan .creditos{display:none;}
 }
 
 /* Error */

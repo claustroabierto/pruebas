@@ -149,6 +149,13 @@ async function start() {
   } catch (e) {
     return fatal("No se pudo acceder a la cámara. Requiere HTTPS y permiso. (" + e.message + ")");
   }
+  // Los créditos acompañan también el escaneo: la carga dura unos segundos,
+  // pero encuadrar la obra puede llevar mucho más. Clonamos la placa dentro de
+  // #scan para no duplicar el markup en cada pieza; se oculta sola al detectar
+  // la obra, porque el motor apaga #scan entero.
+  const placa = $("loading").querySelector(".creditos");
+  if (placa) $("scan").appendChild(placa.cloneNode(true));
+
   $("loading").style.display = "none";
 
   // --- Bucle de render ---
