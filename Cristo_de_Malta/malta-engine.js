@@ -77,16 +77,14 @@ async function start() {
   function makeLabelTex(text, size = 130) {
     const c = document.createElement("canvas");
     const ctx = c.getContext("2d");
-    const font = `800 ${size}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+    // Calibri en NEGRO sólido, sin halo (la pared del museo es blanca → se lee bien).
+    const font = `700 ${size}px Calibri, "Segoe UI", system-ui, sans-serif`;
     ctx.font = font;
-    const pad = size * 0.55;
+    const pad = size * 0.42;
     c.width = Math.ceil(ctx.measureText(text).width) + pad * 2;
     c.height = Math.ceil(size + pad);
     ctx.font = font; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = "rgba(255,255,255,0.96)"; ctx.lineWidth = size * 0.24;  // halo para leerse en cualquier fondo
-    ctx.strokeText(text, c.width / 2, c.height / 2);
-    ctx.fillStyle = "#111"; ctx.fillText(text, c.width / 2, c.height / 2);    // letra negra
+    ctx.fillStyle = "#000"; ctx.fillText(text, c.width / 2, c.height / 2);
     const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     return { tex, aspect: c.width / c.height };
   }
