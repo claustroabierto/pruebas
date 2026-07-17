@@ -24,8 +24,8 @@ window.MUSEO_CONFIG = {
 
   // Globitos de microscopía tocables (coords normalizadas sobre el asset).
   hotspots: [
-    { x: 0.560, y: 0.290, color: "#8a4a36", titulo: "Muestra 1 · zona roja",  pigmento: "Fluorescencia de rayos X", formula: "Ag 48% · Cu 50% · Au 2%",  nota: "Hilo metálico sobre tejido rojo: aleación de plata y cobre con dorado escaso." },
-    { x: 0.568, y: 0.571, color: "#8b7b58", titulo: "Muestra 2 · entorchado", pigmento: "Fluorescencia de rayos X", formula: "Ag 52% · Cu 43% · Au 5%",  nota: "Hilo entorchado: plata y cobre casi a partes iguales, con algo de oro." },
-    { x: 0.570, y: 0.849, color: "#9a8a5f", titulo: "Muestra 3 · dorado",     pigmento: "Fluorescencia de rayos X", formula: "Ag 94% · Cu 1% · Au 5%",   nota: "Hilo dorado de alta pureza de plata: laminilla metálica muy fina." }
+    { x: 0.560, y: 0.290, color: "#8a4a36", img: "assets/micro-muestra1.webp", titulo: "Muestra 1 · zona roja",  pigmento: "Fluorescencia de rayos X", formula: "Ag 48% · Cu 50% · Au 2%",  nota: "Hilo metálico sobre tejido rojo: aleación de plata y cobre con dorado escaso." },
+    { x: 0.568, y: 0.571, color: "#8b7b58", img: "assets/micro-muestra2.webp", titulo: "Muestra 2 · entorchado", pigmento: "Fluorescencia de rayos X", formula: "Ag 52% · Cu 43% · Au 5%",  nota: "Hilo entorchado: plata y cobre casi a partes iguales, con algo de oro." },
+    { x: 0.570, y: 0.849, color: "#9a8a5f", img: "assets/micro-muestra3.webp", titulo: "Muestra 3 · dorado",     pigmento: "Fluorescencia de rayos X", formula: "Ag 94% · Cu 1% · Au 5%",   nota: "Hilo dorado de alta pureza de plata: laminilla metálica muy fina." }
   ]
 };
