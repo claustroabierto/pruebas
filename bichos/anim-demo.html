@@ -75,6 +75,7 @@ if(CFG.medallonUV){const u=CFG.medallonUV;
   uvMesh=new THREE.Mesh(new THREE.PlaneGeometry(u.size*u.aspect,u.size),mat);
   uvMesh.position.set(u.x,u.y,0.01);uvMesh.renderOrder=1;scene.add(uvMesh);
   window.__setUV=(x,y,s)=>{uvMesh.position.set(x,y,0.01);uvMesh.geometry.dispose();uvMesh.geometry=new THREE.PlaneGeometry(s*u.aspect,s);};
+  window.__uvMesh=uvMesh; window.__uvFixOp=null;   // si __uvFixOp!=null, el loop fija esa opacidad
 }
 
 let mode="revolotea", modeStart=0, lookSide=false, sideMix=0;
@@ -120,7 +121,7 @@ renderer.setAnimationLoop(()=>{
     b.mesh.scale.set(b.cur.sx,b.cur.sy,1);
     b.mesh.rotation.z=b.cur.rot;
   }
-  if(uvMesh){uvMix=lerp(uvMix,uvOn?1:0,0.08);uvMesh.material.opacity=uvMix;}
+  if(uvMesh){uvMix=lerp(uvMix,uvOn?1:0,0.08);uvMesh.material.opacity=(window.__uvFixOp!=null)?window.__uvFixOp:uvMix;}
   const ang=sideMix*(Math.sin(now*0.5)*0.4);
   camera.position.set(Math.sin(ang)*D0,0,Math.cos(ang)*D0);camera.lookAt(0,0,0);
   renderer.render(scene,camera);
