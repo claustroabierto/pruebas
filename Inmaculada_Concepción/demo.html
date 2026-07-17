@@ -41,31 +41,19 @@ const PW=1, PH=1.412;
 const pintura=new THREE.Mesh(new THREE.PlaneGeometry(PW,PH),new THREE.MeshBasicMaterial({map:tx(CFG.targetPreview),depthTest:false,depthWrite:false}));
 pintura.renderOrder=0;scene.add(pintura);
 const OV=CFG.overlay;
-// overlay 0..1 -> plano (y invertida: oy 0 = arriba)
-const ov=(ox,oy)=>({x:OV.offsetX+(ox-0.5)*OV.width, y:OV.offsetY-(oy-0.5)*OV.height});
-// reveals (cada uno 850x850 mapea al rect del overlay) + flechas
-const items=CFG.hotspots.map((h,i)=>{
-  const mat=new THREE.MeshBasicMaterial({map:tx(h.reveal),transparent:true,opacity:0,depthTest:false,depthWrite:false});
+// Cada reveal (850x850, con su microscopía+etiqueta+flecha ya dibujada) se
+// superpone alineado sobre la pintura y aparece en su turno (uno por uno).
+const items=CFG.reveals.map((src,i)=>{
+  const mat=new THREE.MeshBasicMaterial({map:tx(src),transparent:true,opacity:0,depthTest:false,depthWrite:false});
   const mesh=new THREE.Mesh(new THREE.PlaneGeometry(OV.width,OV.height),mat);
   mesh.position.set(OV.offsetX,OV.offsetY,0.01+i*0.001);mesh.renderOrder=2+i;scene.add(mesh);
-  // flecha: del centro del círculo al punto del pigmento
-  const a=ov(h.x,h.y), b=ov(h.punto.x,h.punto.y);
-  const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(a.x,a.y,0.02),new THREE.Vector3(b.x,b.y,0.02)]);
-  const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0}));
-  line.renderOrder=20;scene.add(line);
-  // punta de flecha (pequeño disco en el destino)
-  const dot=new THREE.Mesh(new THREE.CircleGeometry(0.012,16),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthTest:false}));
-  dot.position.set(b.x,b.y,0.021);dot.renderOrder=21;scene.add(dot);
-  return {mat,line,dot};
+  return {mat};
 });
 let startT=0;const clock=new THREE.Clock();
-const INTER=CFG.intervaloReveal||0.9;
+const INTER=CFG.intervaloReveal||0.8;
 renderer.setAnimationLoop(()=>{
   const t=clock.getElapsedTime()-startT;
-  for(let i=0;i<items.length;i++){const it=items[i];
-    const ap=step(0.5+i*INTER,0.5+i*INTER+0.6,t);
-    it.mat.opacity=ap;it.line.material.opacity=ap*0.9;it.dot.material.opacity=ap;
-  }
+  for(let i=0;i<items.length;i++) items[i].mat.opacity=step(0.4+i*INTER,0.4+i*INTER+0.55,t);
   renderer.render(scene,camera);
 });
 document.getElementById("btn-re").addEventListener("click",()=>startT=clock.getElapsedTime());

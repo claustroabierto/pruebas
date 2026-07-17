@@ -150,7 +150,7 @@ const btns=[...document.querySelectorAll("#ui button")];
 function setMode(m){mode=m;modeStart=clock.getElapsedTime();document.getElementById("modo").textContent=m.replace("_"," ");
  btns.forEach(b=>b.classList.toggle("on",b.dataset.m===m));}
 btns.forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.m)));
-setMode("recta");
+setMode("flota");   // la elegida por el equipo — abre directo en esta
 document.getElementById("btn-vela").addEventListener("click",e=>{lit=!lit;e.target.textContent=lit?"Apagar velas":"Encender velas";});
 document.getElementById("btn-lado").addEventListener("click",e=>{lookSide=!lookSide;e.target.textContent=lookSide?"Ver de frente":"Ver de lado";});
 </script>
