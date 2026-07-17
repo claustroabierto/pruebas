@@ -134,18 +134,25 @@ async function start() {
   // escala y profundidad durante toda la animación y quedan siempre pegadas a
   // la mecha, sin importar la separación. Coordenadas de config = espacio local
   // de ese plano (ancho 1, x∈[-0.5,0.5]).
+  // Ajustes del fuego (expuestos en config para poder tunearlos con ajuste.html;
+  // los valores por defecto = como estaban fijos antes). FYOFF = qué tan arriba
+  // sobre la punta; FSC = tamaño; FZ = profundidad local (0 = en el plano de la
+  // punta, mejor de lado).
+  const FYOFF = CFG.flameYOffset ?? 0.03;
+  const FZ    = CFG.flameZ ?? 0.002;
+  const FSC   = CFG.flameScale ?? 1.0;
   const flames = (CFG.flames || []).map((f, i) => {
     const uniforms = { uTime: { value: 0 }, uSeed: { value: i * 3.17 + 0.5 }, uAlive: { value: 0 } };
     const fmat = new THREE.ShaderMaterial({
       vertexShader: FLAME_VERT, fragmentShader: FLAME_FRAG, uniforms,
       transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false
     });
-    const fmesh = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.22), fmat);
+    const fmesh = new THREE.Mesh(new THREE.PlaneGeometry(0.16 * FSC, 0.22 * FSC), fmat);
     // z local casi 0: la llama vive en el plano de la punta. Un offset en z la
     // desplazaba lateralmente al ver de lado (se despegaba de la vela). Además es
     // billboard (mira a la cámara en el loop) → se ve sobre la punta desde todos
     // los ángulos.
-    fmesh.position.set(f.x, f.y + 0.03, 0.002);   // casi en el plano de la punta (menos offset = mejor de lado)
+    fmesh.position.set(f.x, f.y + FYOFF, FZ);
     fmesh.renderOrder = 20;
     velasMesh.add(fmesh);
 
@@ -155,8 +162,8 @@ async function start() {
       blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, opacity: 0.0
     });
     const glow = new THREE.Sprite(gmat);
-    glow.position.set(f.x, f.y + 0.01, 0.003);
-    glow.scale.set(0.24, 0.24, 1);
+    glow.position.set(f.x, f.y + FYOFF - 0.02, FZ + 0.001);
+    glow.scale.set(0.24 * FSC, 0.24 * FSC, 1);
     glow.renderOrder = 19;
     velasMesh.add(glow);
 

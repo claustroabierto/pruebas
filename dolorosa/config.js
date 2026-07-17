@@ -45,5 +45,12 @@ window.MUSEO_CONFIG = {
   flames: [
     { x: -0.428, y: 0.043 },
     { x:  0.386, y: 0.048 }
-  ]
+  ],
+
+  // Ajuste fino del fuego (tunear con `ajuste.html`, no a ojo). flameYOffset =
+  // cuánto sube la llama sobre la punta · flameScale = tamaño · flameZ =
+  // profundidad local (0 = pegada al plano de la punta, mejor al ver de lado).
+  flameYOffset: 0.03,
+  flameScale: 1.0,
+  flameZ: 0.002
 };
