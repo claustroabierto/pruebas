@@ -84,7 +84,7 @@ async function start() {
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, h), mat);
     anchor.group.add(mesh);
     const layer = {
-      key: cfg.key, mesh, mat, caption: cfg.caption,
+      key: cfg.key, mesh, mat, titulo: cfg.titulo, desc: cfg.desc,
       slot: cfg.slot,           // dónde termina en la intro
       order: i,                 // orden de aparición (z relativo)
       cur: { x: 0, y: 0, s: 1 },// pose actual (se escribe cada frame)
@@ -110,7 +110,11 @@ async function start() {
   let startT = 0;         // clock time en que se detectó la obra
   const clock = new THREE.Clock();
 
-  function setCaption(txt) { $("caption").textContent = txt || ""; }
+  function setLabel(titulo, desc, hint) {
+    $("label-titulo").textContent = titulo || "";
+    $("label-desc").textContent = desc || "";
+    $("label-hint").textContent = hint || "";
+  }
 
   function resetIntro() {
     phase = "intro";
@@ -121,7 +125,7 @@ async function start() {
       l.cur = { ...POSE.center };
     });
     $("btn-toggle").style.display = "none";
-    setCaption("Analizando la obra…");
+    setLabel("Analizando la obra…", "", "");
   }
 
   anchor.onTargetFound = () => {
@@ -150,15 +154,15 @@ async function start() {
       const pop = 1 + 0.04 * (1 - step(tl.appear[0], tl.appear[1], t));
       l.cur.s = lerp(from.s, to.s, mp) * pop;
     }
-    // Subtítulo narrativo según el momento
-    if (t < TL.uv.appear[0]) setCaption(byKey("ir").caption);
-    else if (t < TL.rx.appear[0]) setCaption(byKey("uv").caption);
-    else setCaption(byKey("rx").caption);
+    // Título + descripción de la técnica según el momento
+    const cap = (t < TL.uv.appear[0]) ? byKey("ir") : (t < TL.rx.appear[0]) ? byKey("uv") : byKey("rx");
+    setLabel(cap.titulo, cap.desc, "");
 
     if (t >= INTRO_END) {
       phase = "interactive";
       $("btn-toggle").style.display = "";
-      setCaption(byKey("rx").caption + "  ·  toca los laterales para comparar");
+      const rx = byKey("rx");
+      setLabel(rx.titulo, rx.desc, "Toca los laterales para compararlas");
     }
   }
 
@@ -199,7 +203,7 @@ async function start() {
     const freed = L.slot;
     if (centerL) { centerL.slot = freed; centerL.peek = false; }
     L.slot = "center"; L.peek = false;
-    setCaption(L.caption + "  ·  toca el centro para ver la obra real");
+    setLabel(L.titulo, L.desc, "Toca el centro para ver la obra real");
   }
   window.addEventListener("pointerdown", (e) => handleTap(e.clientX, e.clientY, e.target));
   window.addEventListener("touchstart", (e) => {

@@ -32,21 +32,24 @@ window.MUSEO_CONFIG = {
       src: "assets/ir.webp",
       aspect: 0.7669,
       slot: "left",
-      caption: "Infrarrojo · aflora el dibujo subyacente del Cristo"
+      titulo: "Infrarrojo",
+      desc: "Aflora el dibujo subyacente: las líneas con que el pintor trazó el Cristo antes de pintarlo."
     },
     {
       key: "uv",
       src: "assets/uv.webp",
       aspect: 0.7753,
       slot: "right",
-      caption: "Ultravioleta · barnices y retoques en la superficie"
+      titulo: "Ultravioleta",
+      desc: "Revela barnices y retoques en la superficie: dónde y cuándo se intervino la obra."
     },
     {
       key: "rx",
       src: "assets/rx.webp",
       aspect: 0.7669,
       slot: "center",
-      caption: "Rayos X · una Virgen oculta fue pintada bajo el Cristo"
+      titulo: "Rayos X",
+      desc: "Bajo el Cristo hay otra pintura: una Virgen que fue cubierta y quedó oculta durante siglos."
     }
   ]
 };
