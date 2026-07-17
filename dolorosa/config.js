@@ -38,7 +38,7 @@ window.MUSEO_CONFIG = {
   // escala y profundidad en toda la animación y quedan siempre pegadas a la
   // mecha. Detectadas automáticamente (punta de la barra de cera de cada cirio).
   flames: [
-    { x: -0.418, y: 0.042 },
-    { x:  0.398, y: 0.049 }
+    { x: -0.438, y: 0.042 },
+    { x:  0.378, y: 0.049 }
   ]
 };
