@@ -9,7 +9,8 @@ html,body{height:100%;background:#0d0b12;color:#f4efe6;overflow:hidden;touch-act
 #hint b{color:#c9a24b}
 #pill{position:fixed;left:8px;top:40px;z-index:6;background:#171320ee;border:1px solid #ffffff22;border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.55;font-variant-numeric:tabular-nums}
 #pill .v{color:#c9a24b;font-weight:700}
-#cfg{position:fixed;left:8px;right:8px;bottom:118px;z-index:6;background:#0b0910f4;border:1px solid #ffffff22;border-radius:12px;padding:8px 10px;font-size:11px;font-family:ui-monospace,Consolas,monospace;color:#a7d3a0;word-break:break-all}
+#toast{max-width:92vw}
+#toast .line{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#dfffe0;margin-top:6px;word-break:break-all;text-align:left}
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px;background:#0b0910ee;border-top:1px solid #ffffff22}
 .bar button{pointer-events:auto;background:#221c30;color:#f4efe6;border:1px solid #ffffff33;border-radius:8px;padding:9px 11px;font-size:13px;min-width:44px}
 .bar button:active{background:#3a2f52}
@@ -26,7 +27,6 @@ html,body{height:100%;background:#0d0b12;color:#f4efe6;overflow:hidden;touch-act
 <div id="hint">Arrastra para <b>mover</b> · pellizca o rueda para <b>escalar</b> · ajusta hasta que las flechas apunten bien y toca <b>Copiar</b></div>
 <div id="pill">width <span class="v" id="pw">–</span><br>offsetX <span class="v" id="px">–</span><br>offsetY <span class="v" id="py">–</span></div>
 <div id="op">pintura<input id="opac" type="range" min="0" max="100" value="100"/></div>
-<div id="cfg">…</div>
 <div class="bar">
   <div class="grp"><small>X</small><button data-k="x" data-d="-1">◀</button><button data-k="x" data-d="1">▶</button></div>
   <div class="grp"><small>Y</small><button data-k="y" data-d="1">▲</button><button data-k="y" data-d="-1">▼</button></div>
@@ -73,12 +73,11 @@ CFG.reveals.forEach((src,i)=>{
     new THREE.MeshBasicMaterial({map:tx(src),transparent:true,depthTest:false,depthWrite:false}));
   m.position.set(0,0,0.01+i*0.001);m.renderOrder=2+i;grupo.add(m);
 });
+function cfgLine(){return `overlay: { src: "${OV.src}", width: ${+W.toFixed(3)}, height: ${+W.toFixed(3)}, offsetX: ${+X.toFixed(3)}, offsetY: ${+Y.toFixed(3)} },`;}
 function apply(){grupo.scale.set(W,W,1);grupo.position.set(X,Y,0);
   document.getElementById("pw").textContent=W.toFixed(3);
   document.getElementById("px").textContent=X.toFixed(3);
   document.getElementById("py").textContent=Y.toFixed(3);
-  document.getElementById("cfg").textContent=
-    `overlay: { src: "${OV.src}", width: ${+W.toFixed(3)}, height: ${+W.toFixed(3)}, offsetX: ${+X.toFixed(3)}, offsetY: ${+Y.toFixed(3)} },`;
 }
 apply();
 renderer.setAnimationLoop(()=>renderer.render(scene,camera));
@@ -105,11 +104,12 @@ addEventListener("keydown",e=>{const m={ArrowLeft:["x",-1],ArrowRight:["x",1],Ar
   if(!m)return;e.preventDefault();const[k,d]=m;if(k==="x")X+=d*NUDGE.x;if(k==="y")Y+=d*NUDGE.y;if(k==="w")W+=d*NUDGE.w;apply();});
 document.getElementById("reset").addEventListener("click",()=>{W=START.W;X=START.X;Y=START.Y;apply();});
 document.getElementById("opac").addEventListener("input",e=>{pintMat.opacity=e.target.value/100;});
-const toast=document.getElementById("toast");
+const toast=document.getElementById("toast");let toastT=0;
 document.getElementById("copy").addEventListener("click",async()=>{
-  const txt=document.getElementById("cfg").textContent;
+  const txt=cfgLine();
   try{await navigator.clipboard.writeText(txt);}catch{ const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();}
-  toast.style.opacity=1;setTimeout(()=>toast.style.opacity=0,1200);
+  toast.innerHTML=`✓ copiado — pégamelo en el chat<div class="line">${txt}</div>`;
+  toast.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>toast.style.opacity=0,4000);
 });
 </script>
 </body></html>

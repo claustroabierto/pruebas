@@ -17,16 +17,14 @@ window.MUSEO_CONFIG = {
   targetSrc: "assets/targets.mind",
   targetPreview: "assets/target.jpg",
 
-  // Geometría de alineación (unidades MindAR: ancho de la pintura = 1). El
-  // overlay 850x850 se ubica sobre la pintura resolviendo por sus flechas: la de
-  // Carnación debe caer en el ROSTRO (pv≈0.15) y las de Morado/Blanco en los
-  // ÁNGELES de la base (pv≈0.85). De ahí salen width=1.556 y offsetY=0.105 (antes
-  // 1.583 / 0.018, que dejaba la pintura demasiado arriba: Carnación apuntaba al
-  // cuello y no a la cara). Nota: las flechas de Carnación y Verde en los reveals
-  // están casi a la misma altura, así que con una sola transformación uniforme
-  // Verde queda un pelo por encima de la cruz del pecho (límite del asset).
+  // Geometría de alineación (unidades MindAR: ancho de la pintura = 1). Ajustado
+  // A MANO por el equipo con `align.html` (arrastrar/escalar en vivo sobre la
+  // pintura) — NO tantear estos números, usar la herramienta. Nota: las flechas de
+  // Carnación y Verde en los reveals están casi a la misma altura, así que con una
+  // sola transformación uniforme no se pueden clavar ambas a la vez (límite del
+  // asset; el arreglo fino sería regenerar las flechas de los reveals).
   // `src` = el análisis completo corregido (fallback para la pieza AR).
-  overlay: { src: "assets/overlay-nuevo.webp", width: 1.556, height: 1.556, offsetX: 0.012, offsetY: 0.105 },
+  overlay: { src: "assets/overlay-nuevo.webp", width: 1.556, height: 1.556, offsetX: 0.012, offsetY: 0.061 },
 
   // Revelado uno por uno (recortes del "sin target", con flecha incluida).
   revelarSecuencial: true,
