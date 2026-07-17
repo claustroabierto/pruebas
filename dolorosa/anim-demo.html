@@ -93,9 +93,9 @@ function makeGlow(){const s=64,cv=document.createElement("canvas");cv.width=cv.h
 const flames=(CFG.flames||[]).map((f,i)=>{
  const uniforms={uTime:{value:0},uSeed:{value:i*3.17+0.5},uAlive:{value:0}};
  const fmat=new THREE.ShaderMaterial({vertexShader:FLAME_VERT,fragmentShader:FLAME_FRAG,uniforms,transparent:true,blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false});
- const fmesh=new THREE.Mesh(new THREE.PlaneGeometry(0.16,0.22),fmat);fmesh.position.set(f.x,f.y+0.03,0.006);fmesh.renderOrder=20;velasMesh.add(fmesh);
+ const fmesh=new THREE.Mesh(new THREE.PlaneGeometry(0.16,0.22),fmat);fmesh.position.set(f.x,f.y+0.03,0.002);fmesh.renderOrder=20;velasMesh.add(fmesh);
  const gmat=new THREE.SpriteMaterial({map:makeGlow(),color:0xffb45a,transparent:true,blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false,opacity:0});
- const glow=new THREE.Sprite(gmat);glow.position.set(f.x,f.y+0.01,0.008);glow.scale.set(0.24,0.24,1);glow.renderOrder=19;velasMesh.add(glow);
+ const glow=new THREE.Sprite(gmat);glow.position.set(f.x,f.y+0.01,0.003);glow.scale.set(0.24,0.24,1);glow.renderOrder=19;velasMesh.add(glow);
  return{uniforms,glow,fmesh};});
 const _bq=new THREE.Quaternion();  // billboard de las llamas
 

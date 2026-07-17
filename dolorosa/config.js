@@ -29,7 +29,7 @@ window.MUSEO_CONFIG = {
   // "sale" del cuadro, visible de frente SIN compensar el tamaño).
   layers: [
     { key: "fondo",  src: "assets/fondo.webp",  z: 0.00 },
-    { key: "virgen", src: "assets/virgen.webp", z: 0.22, salida: 0.10 },
+    { key: "virgen", src: "assets/virgen.webp", z: 0.22, salida: 0.15 },
     // La capa velas tiene DOS texturas:
     //  - src (sin llama pintada): estado ENCENDIDO → solo se ve la llama
     //    procedural animada, sin la doble llama estática que se veía feo.

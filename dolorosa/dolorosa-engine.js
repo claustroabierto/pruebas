@@ -145,7 +145,7 @@ async function start() {
     // desplazaba lateralmente al ver de lado (se despegaba de la vela). Además es
     // billboard (mira a la cámara en el loop) → se ve sobre la punta desde todos
     // los ángulos.
-    fmesh.position.set(f.x, f.y + 0.03, 0.006);
+    fmesh.position.set(f.x, f.y + 0.03, 0.002);   // casi en el plano de la punta (menos offset = mejor de lado)
     fmesh.renderOrder = 20;
     velasMesh.add(fmesh);
 
@@ -155,7 +155,7 @@ async function start() {
       blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, opacity: 0.0
     });
     const glow = new THREE.Sprite(gmat);
-    glow.position.set(f.x, f.y + 0.01, 0.008);
+    glow.position.set(f.x, f.y + 0.01, 0.003);
     glow.scale.set(0.24, 0.24, 1);
     glow.renderOrder = 19;
     velasMesh.add(glow);
