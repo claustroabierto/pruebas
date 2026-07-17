@@ -11,6 +11,7 @@ import { MindARThree } from "mindar-image-three";
 const CFG = window.MUSEO_CONFIG;
 const $ = (id) => document.getElementById(id);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const step = (a, b, t) => { const x = clamp((t - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); };
 
 function fatal(msg) {
   const el = $("error");
@@ -62,8 +63,25 @@ async function start() {
     return mesh;
   }
   const ov = CFG.overlay;
-  addLayer(ov, 0.001);
-  (CFG.extras || []).forEach((ex, i) => addLayer(ex, 0.002 + i * 0.001));
+  // Revelado uno por uno (opcional): si la pieza trae `revelarSecuencial` + `reveals`,
+  // el AR muestra los recortes CON su flecha apareciendo en secuencia (igual que la
+  // demo), en vez del overlay combinado. Comparten geometría/offset del overlay.
+  const seq = !!(CFG.revelarSecuencial && CFG.reveals && CFG.reveals.length);
+  const seqMats = [];
+  if (seq) {
+    CFG.reveals.forEach((src, i) => {
+      const tex = loader.load(src); tex.colorSpace = THREE.SRGBColorSpace;
+      const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthTest: false, depthWrite: false });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(ov.width, ov.height), mat);
+      mesh.position.set(ov.offsetX, ov.offsetY, 0.001 + i * 0.001);
+      mesh.renderOrder = i;
+      anchor.group.add(mesh);
+      seqMats.push(mat);
+    });
+  } else {
+    addLayer(ov, 0.001);
+    (CFG.extras || []).forEach((ex, i) => addLayer(ex, 0.002 + i * 0.001));
+  }
 
   // --- Hotspots (anillo visual + disco invisible de toque, más grande) ---
   const hotMeshes = [];  // aros visuales (pulsan)
@@ -89,17 +107,26 @@ async function start() {
 
   // --- Estado de detección + UI ---
   let visible = false;
-  anchor.onTargetFound = () => { visible = true; $("scan").style.display = "none"; $("panel").classList.add("on"); };
+  let seqStart = 0;   // instante en que arrancó el revelado secuencial
+  anchor.onTargetFound = () => { visible = true; $("scan").style.display = "none"; $("panel").classList.add("on"); if (seq) seqStart = performance.now(); };
   anchor.onTargetLost = () => { visible = false; $("scan").style.display = "flex"; $("panel").classList.remove("on"); closeCard(); };
 
-  // Slider de revelado (interactivo): 0 = pintura limpia, 1 = análisis completo
+  // Slider de revelado (interactivo): 0 = pintura limpia, 1 = análisis completo.
+  // En modo secuencial no aplica: el revelado se anima solo y el botón REPITE.
   const slider = $("reveal");
   let reveal = 0;
   slider.addEventListener("input", () => { reveal = slider.value / 100; });
   $("btn-toggle").addEventListener("click", () => {
+    if (seq) { if (visible) seqStart = performance.now(); return; }
     reveal = reveal > 0.5 ? 0 : 1;
     slider.value = reveal * 100;
   });
+  if (seq) {
+    slider.style.display = "none";
+    $("btn-toggle").textContent = "Repetir";
+    const ph = slider.closest("#panel") && slider.closest("#panel").querySelector(".hint");
+    if (ph) ph.textContent = "Las microscopías aparecen una por una · toca cada círculo ● para ver el detalle";
+  }
 
   // --- Toque sobre hotspots (proyección a pantalla + distancia; robusto en iOS) ---
   const _wp = new THREE.Vector3();
@@ -179,17 +206,34 @@ async function start() {
 
   // --- Bucle de render ---
   const clock = new THREE.Clock();
+  const INTER = CFG.intervaloReveal || 0.8;
   renderer.setAnimationLoop(() => {
     const t = clock.getElapsedTime();
-    // fade de todas las capas según revelado
-    fadeMats.forEach((m) => { m.opacity += (reveal - m.opacity) * 0.15; });
-    // pulso de los anillos, escalado por revelado
-    hotMeshes.forEach((m) => {
-      const pulse = 1 + Math.sin(t * 3 + m.userData.idx) * 0.12;
-      const s = pulse * m.userData.base;
-      m.scale.set(s, s, s);
-      m.material.opacity = 0.15 + reveal * 0.85;
-    });
+    if (seq) {
+      // Revelado uno por uno: cada recorte (con su flecha) aparece en su turno.
+      const et = (performance.now() - seqStart) / 1000;
+      let shown = 0;
+      seqMats.forEach((m, i) => {
+        const o = visible ? step(0.4 + i * INTER, 0.4 + i * INTER + 0.55, et) : 0;
+        m.opacity += (o - m.opacity) * 0.3;
+        if (o > 0.5) shown++;
+      });
+      // Los círculos ya se dibujan en los recortes → ocultamos los anillos (evita
+      // el doble círculo); los discos de toque invisibles siguen activos.
+      const prog = seqMats.length ? shown / seqMats.length : 0;
+      hotMeshes.forEach((m) => { m.material.opacity = 0; });
+      void prog;
+    } else {
+      // fade de todas las capas según revelado
+      fadeMats.forEach((m) => { m.opacity += (reveal - m.opacity) * 0.15; });
+      // pulso de los anillos, escalado por revelado
+      hotMeshes.forEach((m) => {
+        const pulse = 1 + Math.sin(t * 3 + m.userData.idx) * 0.12;
+        const s = pulse * m.userData.base;
+        m.scale.set(s, s, s);
+        m.material.opacity = 0.15 + reveal * 0.85;
+      });
+    }
     renderer.render(scene, camera);
   });
 }
