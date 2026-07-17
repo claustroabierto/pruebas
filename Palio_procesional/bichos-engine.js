@@ -131,6 +131,15 @@ async function start() {
     e.stopPropagation(); micOn = !micOn; if (micOn) uvOn = false;
     micBtn.classList.toggle("on", micOn); if (uvBtn) uvBtn.classList.toggle("on", uvOn); refreshCaption();
   });
+  // Repetir: apaga UV/micro y vuelve a lanzar la emergencia desde el centro.
+  const repeatBtn = $("btn-repeat");
+  if (repeatBtn) repeatBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); if (!visible) return;
+    uvOn = false; micOn = false;
+    if (uvBtn) uvBtn.classList.remove("on"); if (micBtn) micBtn.classList.remove("on");
+    startT = clock.getElapsedTime(); bichos.forEach(b => b.cur = null);
+    refreshCaption();
+  });
   function handleTap(el) {
     if (!visible) return;
     if (el && el.closest && el.closest("#panel, #topbar, #error")) return;

@@ -26,7 +26,7 @@ window.MUSEO_CONFIG = {
   mantonReg:   { x: 0.0, y: 0.0, size: 1.0 },
   fondoVacio:  { src: "assets/fondo-vacio.webp",  aspect: 1.365 },
   uvManton:    { src: "assets/uv-manton.webp",    aspect: 1.389 },
-  microManton: { src: "assets/micro-manton.webp", aspect: 1.389 },
+  microManton: { src: "assets/micro-manton.webp?v=2", aspect: 1.389 },
 
   // 15 insectos: nacen en el CENTRO (0,0) diminutos y vuelan hacia estas posiciones.
   // spread = cuánto revolotea al llegar · flap = aleteo.
