@@ -141,7 +141,11 @@ async function start() {
       transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false
     });
     const fmesh = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.22), fmat);
-    fmesh.position.set(f.x, f.y + 0.03, 0.02);   // local; +0.03 → la base nace en la punta
+    // z local casi 0: la llama vive en el plano de la punta. Un offset en z la
+    // desplazaba lateralmente al ver de lado (se despegaba de la vela). Además es
+    // billboard (mira a la cámara en el loop) → se ve sobre la punta desde todos
+    // los ángulos.
+    fmesh.position.set(f.x, f.y + 0.03, 0.006);
     fmesh.renderOrder = 20;
     velasMesh.add(fmesh);
 
@@ -151,13 +155,14 @@ async function start() {
       blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, opacity: 0.0
     });
     const glow = new THREE.Sprite(gmat);
-    glow.position.set(f.x, f.y + 0.01, 0.015);
+    glow.position.set(f.x, f.y + 0.01, 0.008);
     glow.scale.set(0.24, 0.24, 1);
     glow.renderOrder = 19;
     velasMesh.add(glow);
 
-    return { uniforms, fmat, gmat, glow };
+    return { uniforms, fmat, gmat, glow, fmesh };
   });
+  const _bq = new THREE.Quaternion();   // reutilizado para el billboard de las llamas
 
   // Textura de glow radial (generada, sin assets externos).
   function makeGlow() {
@@ -263,8 +268,12 @@ async function start() {
     }
 
     // Llamas + glow: viven mientras las velas están encendidas.
+    velasMesh.getWorldQuaternion(_bq); _bq.invert();   // para billboard de las llamas
     for (const f of flames) {
       f.uniforms.uTime.value = now;
+      // billboard: la llama mira siempre a la cámara → se ve sobre la punta desde
+      // cualquier ángulo (compensa la rotación del plano de velas).
+      f.fmesh.quaternion.copy(camera.quaternion).premultiply(_bq);
       const alive = litMix * appear;
       f.uniforms.uAlive.value = alive;            // el shader multiplica todo por esto (fade real)
       f.glow.material.opacity = alive * (0.55 + flick * 3.0); // el halo late
