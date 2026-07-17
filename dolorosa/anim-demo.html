@@ -105,13 +105,15 @@ const clock=new THREE.Clock();
 function virgen(L,now,mt){
  const baseS=(D0-L.z)/D0, A=L.salida||0.10;
  let py=0, pz=L.z, s=baseS;
- const osc=0.5-0.5*Math.cos(now*0.7);          // 0..1 ida y vuelta (loop)
+ // La oscilación usa mt (tiempo desde que se eligió el modo), así cada modo
+ // arranca desde el REPOSO (out=0) y no brinca al seleccionarlo.
+ const osc=0.5-0.5*Math.cos(mt*0.7);           // 0..1 ida y vuelta (loop)
  if(mode==="diagonal"){const out=osc*A; py=out*0.10; pz=L.z+out; s=baseS*(1+out*0.9);}
  else if(mode==="recta"){const out=osc*A; pz=L.z+out; s=baseS*(1+out*0.9);}
  else if(mode==="recta_queda"){const p=smooth(0,2.2,mt); const out=p*A; pz=L.z+out; s=baseS*(1+out*0.9);
-   const br=0.5-0.5*Math.cos(now*1.1); s*=1+br*0.012;}                 // respiración mínima
- else if(mode==="flota"){const p=smooth(0,1.8,mt); const out=p*A; py=Math.sin(now*0.8)*0.02*p; pz=L.z+out; s=baseS*(1+out*0.9);}
- else if(mode==="respira"){const br=0.5-0.5*Math.cos(now*0.9); s=baseS*(1+br*0.05);}
+   const br=0.5-0.5*Math.cos(mt*1.1); s*=1+br*0.012;}                  // respiración mínima
+ else if(mode==="flota"){const p=smooth(0,1.8,mt); const out=p*A; py=Math.sin(mt*0.8)*0.02*p; pz=L.z+out; s=baseS*(1+out*0.9);}
+ else if(mode==="respira"){const br=0.5-0.5*Math.cos(mt*0.9); s=baseS*(1+br*0.05);}
  return {py,pz,s};
 }
 
@@ -123,7 +125,11 @@ renderer.setAnimationLoop(()=>{
  for(const L of layers){
   if(L.matAlt){L.mat.opacity=litMix;L.matAlt.opacity=1-litMix;}else{L.mat.opacity=1;}
   let py=0,pz=L.z,s=(D0-L.z)/D0;
-  if(L.salida){const v=virgen(L,now,mt);py=v.py;pz=v.pz;s=v.s;}
+  if(L.salida){const v=virgen(L,now,mt);
+   // suavizado: cualquier cambio de modo se interpola, nunca salta
+   if(!L.cur)L.cur={py:v.py,pz:v.pz,s:v.s};
+   L.cur.py=lerp(L.cur.py,v.py,0.12);L.cur.pz=lerp(L.cur.pz,v.pz,0.12);L.cur.s=lerp(L.cur.s,v.s,0.12);
+   py=L.cur.py;pz=L.cur.pz;s=L.cur.s;}
   L.mesh.position.set(0,py,pz);L.mesh.scale.set(s,s,1);
   L.col.copy(UNLIT).lerp(LIT,litMix);const warm=1-flick*litMix*0.6;
   L.mat.color.setRGB(L.col.r*warm,L.col.g*warm,L.col.b*warm);
