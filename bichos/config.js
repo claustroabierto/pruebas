@@ -18,6 +18,10 @@ window.MUSEO_CONFIG = {
   fondo: "assets/manton.webp",   // solo para la demo sin cámara
   aspect: 1.462,                 // ancho/alto del mantón (target 1300x889)
 
+  // Revelado bajo luz UV: el medallón central del mantón fluoresce (flores
+  // azules). El overlay (capa 1.png del equipo) cae sobre el medallón real.
+  medallonUV: { src: "assets/medallon-uv.webp", aspect: 0.997, x: -0.02, y: 0.05, size: 0.33 },
+
   // Los bichos: posición base sobre el mantón + su vuelo. `spread` = cuánto se
   // aleja volando; `flap` = velocidad de aleteo (aves lento, insectos rápido).
   bichos: [

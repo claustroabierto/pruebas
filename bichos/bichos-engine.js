@@ -47,6 +47,15 @@ async function start() {
     return { ...b, mesh, mat, ph: i * 1.7, fx: 0.33 + i * 0.028, fy: 0.26 + i * 0.022, cur: null };
   });
 
+  // Medallón UV (revelado): overlay sobre el medallón central del mantón.
+  let uvMesh = null, uvOn = false, uvMix = 0;
+  if (CFG.medallonUV) {
+    const u = CFG.medallonUV;
+    const mat = new THREE.MeshBasicMaterial({ map: tex(u.src), transparent: true, opacity: 0, depthTest: false, depthWrite: false });
+    uvMesh = new THREE.Mesh(new THREE.PlaneGeometry(u.size * u.aspect, u.size), mat);
+    uvMesh.position.set(u.x, u.y, 0.005); uvMesh.renderOrder = 1; anchor.group.add(uvMesh);
+  }
+
   let mode = "revolotea", visible = false, lastTap = -1;
   const clock = new THREE.Clock();
   const setCaption = (t) => { $("caption").textContent = t || ""; };
@@ -71,6 +80,10 @@ async function start() {
   const toggle = () => { mode = mode === "revolotea" ? "enjambre" : "revolotea"; updateBtn();
     setCaption(mode === "enjambre" ? "Los bordados vuelan por todo el mantón" : "Los insectos revolotean sobre la seda"); };
   $("btn-modo").addEventListener("click", (e) => { e.stopPropagation(); toggle(); });
+  const uvBtn = $("btn-uv");
+  if (uvBtn) uvBtn.addEventListener("click", (e) => { e.stopPropagation(); uvOn = !uvOn;
+    uvBtn.classList.toggle("on", uvOn);
+    setCaption(uvOn ? "Bajo luz UV el medallón fluoresce" : (mode === "enjambre" ? "Los bordados vuelan por todo el mantón" : "Los insectos revolotean sobre la seda")); });
   function handleTap(el) {
     if (!visible) return;
     if (el && el.closest && el.closest("#panel, #topbar, #error")) return;
@@ -89,6 +102,7 @@ async function start() {
 
   renderer.setAnimationLoop(() => {
     const now = clock.getElapsedTime();
+    if (uvMesh) { uvMix = lerp(uvMix, uvOn ? 1 : 0, 0.08); uvMesh.material.opacity = uvMix; }
     for (let i = 0; i < bichos.length; i++) {
       const b = bichos[i], t = trans(b, i, now);
       if (!b.cur) b.cur = { ...t };

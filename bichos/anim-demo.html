@@ -31,7 +31,7 @@
   <button data-m="despega">Despegan uno a uno</button>
   <button data-m="posado">Quietos (bordado)</button>
 </div>
-<div class="sec"><button id="btn-lado">Ver de lado</button></div>
+<div class="sec"><button id="btn-uv">Luz UV</button><button id="btn-lado">Ver de lado</button></div>
 <div id="hint">Modo: <b id="modo">revolotean</b> · los bordados del mantón cobran vida y vuelan · toca las opciones para comparar</div>
 
 <script src="config.js"></script>
@@ -68,6 +68,15 @@ const bichos=CFG.bichos.map((b,i)=>{
   return {...b,mesh,mat,ph:i*1.7,fx:0.33+i*0.028,fy:0.26+i*0.022,cur:null};
 });
 
+// Medallón UV (revelado): overlay sobre el medallón central del mantón
+let uvMesh=null, uvOn=false, uvMix=0;
+if(CFG.medallonUV){const u=CFG.medallonUV;
+  const mat=new THREE.MeshBasicMaterial({map:tex(u.src),transparent:true,opacity:0,depthTest:false,depthWrite:false});
+  uvMesh=new THREE.Mesh(new THREE.PlaneGeometry(u.size*u.aspect,u.size),mat);
+  uvMesh.position.set(u.x,u.y,0.01);uvMesh.renderOrder=1;scene.add(uvMesh);
+  window.__setUV=(x,y,s)=>{uvMesh.position.set(x,y,0.01);uvMesh.geometry.dispose();uvMesh.geometry=new THREE.PlaneGeometry(s*u.aspect,s);};
+}
+
 let mode="revolotea", modeStart=0, lookSide=false, sideMix=0;
 const clock=new THREE.Clock();
 
@@ -98,6 +107,7 @@ renderer.setAnimationLoop(()=>{
     b.mesh.scale.set(b.cur.sx,b.cur.sy,1);
     b.mesh.rotation.z=b.cur.rot;
   }
+  if(uvMesh){uvMix=lerp(uvMix,uvOn?1:0,0.08);uvMesh.material.opacity=uvMix;}
   const ang=sideMix*(Math.sin(now*0.5)*0.4);
   camera.position.set(Math.sin(ang)*D0,0,Math.cos(ang)*D0);camera.lookAt(0,0,0);
   renderer.render(scene,camera);
@@ -110,6 +120,7 @@ function setMode(m){mode=m;modeStart=clock.getElapsedTime();
 btns.forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.m)));
 setMode("revolotea");
 document.getElementById("btn-lado").addEventListener("click",e=>{lookSide=!lookSide;e.target.textContent=lookSide?"Ver de frente":"Ver de lado";});
+document.getElementById("btn-uv").addEventListener("click",e=>{uvOn=!uvOn;e.target.classList.toggle("on",uvOn);});
 </script>
 </body>
 </html>
