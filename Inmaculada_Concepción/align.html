@@ -9,8 +9,6 @@ html,body{height:100%;background:#0d0b12;color:#f4efe6;overflow:hidden;touch-act
 #hint b{color:#c9a24b}
 #pill{position:fixed;left:8px;top:40px;z-index:6;background:#171320ee;border:1px solid #ffffff22;border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.55;font-variant-numeric:tabular-nums}
 #pill .v{color:#c9a24b;font-weight:700}
-#toast{max-width:92vw}
-#toast .line{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:#dfffe0;margin-top:6px;word-break:break-all;text-align:left}
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px;background:#0b0910ee;border-top:1px solid #ffffff22}
 .bar button{pointer-events:auto;background:#221c30;color:#f4efe6;border:1px solid #ffffff33;border-radius:8px;padding:9px 11px;font-size:13px;min-width:44px}
 .bar button:active{background:#3a2f52}
@@ -19,7 +17,6 @@ html,body{height:100%;background:#0d0b12;color:#f4efe6;overflow:hidden;touch-act
 .grp small{opacity:.7;padding:0 4px}
 #op{position:fixed;right:8px;top:40px;z-index:6;background:#171320ee;border:1px solid #ffffff22;border-radius:12px;padding:8px 10px;font-size:11px;text-align:center}
 #op input{width:90px;display:block;margin-top:6px}
-#toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;background:#1c8a3fee;color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
 </head><body>
@@ -34,7 +31,6 @@ html,body{height:100%;background:#0d0b12;color:#f4efe6;overflow:hidden;touch-act
   <button id="reset" class="wide">↺ Original</button>
   <button id="copy" class="wide">⧉ Copiar</button>
 </div>
-<div id="toast">copiado</div>
 <script src="config.js"></script>
 <script type="module">
 import * as THREE from "three";
@@ -104,12 +100,11 @@ addEventListener("keydown",e=>{const m={ArrowLeft:["x",-1],ArrowRight:["x",1],Ar
   if(!m)return;e.preventDefault();const[k,d]=m;if(k==="x")X+=d*NUDGE.x;if(k==="y")Y+=d*NUDGE.y;if(k==="w")W+=d*NUDGE.w;apply();});
 document.getElementById("reset").addEventListener("click",()=>{W=START.W;X=START.X;Y=START.Y;apply();});
 document.getElementById("opac").addEventListener("input",e=>{pintMat.opacity=e.target.value/100;});
-const toast=document.getElementById("toast");let toastT=0;
-document.getElementById("copy").addEventListener("click",async()=>{
+const copyBtn=document.getElementById("copy");let copyT=0;
+copyBtn.addEventListener("click",async()=>{
   const txt=cfgLine();
   try{await navigator.clipboard.writeText(txt);}catch{ const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();}
-  toast.innerHTML=`✓ copiado — pégamelo en el chat<div class="line">${txt}</div>`;
-  toast.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>toast.style.opacity=0,4000);
+  copyBtn.textContent="✓ copiado";clearTimeout(copyT);copyT=setTimeout(()=>copyBtn.textContent="⧉ Copiar",1500);
 });
 </script>
 </body></html>
