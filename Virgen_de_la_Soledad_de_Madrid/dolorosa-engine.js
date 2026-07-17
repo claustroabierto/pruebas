@@ -95,6 +95,12 @@ async function start() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
   const anchor = mindar.addAnchor(0);
+  // "stage" = grupo intermedio con todo el contenido. En reposo es identidad
+  // (todo queda pegado al cuadro por el tracking). El botón "Ver de lado" anima
+  // SOLO este grupo (rota + levanta un poco) para mostrar la profundidad y vuelve
+  // solo — sin pelear con MindAR ni saltos.
+  const stage = new THREE.Group();
+  anchor.group.add(stage);
   const loader = new THREE.TextureLoader();
   const H = 1 / CFG.aspect;
   const D0 = CFG.nominalDistance || 2.0;
@@ -110,7 +116,7 @@ async function start() {
     });
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, H), mat);
     mesh.renderOrder = i;
-    anchor.group.add(mesh);
+    stage.add(mesh);
     const layer = { key: cfg.key, mesh, mat, z: cfg.z || 0, salida: cfg.salida || 0, col: new THREE.Color() };
 
     // Textura alterna (velas apagadas = pintura original con su llama). Se
@@ -188,6 +194,8 @@ async function start() {
   let startT = 0;
   let lit = true;
   let litMix = 1;
+  let vitrina = false, vitStart = 0;   // "Ver de lado": levanta+rota el stage y vuelve solo
+  const VIT_DUR = 6.0;                 // segundos que dura el efecto
   const clock = new THREE.Clock();
 
   const setCaption = (t) => { $("caption").textContent = t || ""; };
@@ -202,6 +210,8 @@ async function start() {
   };
   anchor.onTargetLost = () => {
     visible = false;
+    vitrina = false;                 // si se pierde la obra, cancela el efecto
+    stage.rotation.set(0, 0, 0); stage.position.set(0, 0, 0); stage.scale.set(1, 1, 1);
     $("scan").style.display = "flex";
     $("panel").classList.remove("on");
   };
@@ -211,6 +221,11 @@ async function start() {
   const toggleVelas = () => { lit = !lit; updateBoton(); };
   $("btn-velas").addEventListener("click", (e) => { e.stopPropagation(); toggleVelas(); });
   $("btn-repeat").addEventListener("click", (e) => { e.stopPropagation(); if (visible) replay(); });
+  const btnLado = $("btn-lado");
+  if (btnLado) btnLado.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (visible && !vitrina) { vitrina = true; vitStart = clock.getElapsedTime(); }
+  });
   function handleTap(targetEl) {
     if (!visible) return;
     if (targetEl && targetEl.closest && targetEl.closest("#panel, #topbar, #error")) return;
@@ -237,6 +252,21 @@ async function start() {
   renderer.setAnimationLoop(() => {
     const now = clock.getElapsedTime();
     const t = now - startT;
+
+    // "Ver de lado": mece el stage (rota + se levanta) para mostrar la profundidad
+    // y vuelve solo. env 0→1→0 = arranca y termina en identidad, sin saltos.
+    if (vitrina) {
+      const vt = now - vitStart;
+      if (vt >= VIT_DUR) {
+        vitrina = false;
+        stage.rotation.set(0, 0, 0); stage.position.set(0, 0, 0); stage.scale.set(1, 1, 1);
+      } else {
+        const env = Math.sin(Math.PI * (vt / VIT_DUR));
+        stage.rotation.set(0, env * Math.sin(vt * 1.6) * 0.6, 0);   // vaivén izq-der ±34°
+        stage.position.set(0, 0, env * 0.12);                        // se despega hacia el visitante
+        const s = 1 + env * 0.08; stage.scale.set(s, s, s);
+      }
+    }
 
     litMix = lerp(litMix, lit ? 1 : 0, 0.06);
     const appear = step(0.0, 0.5, t);
@@ -290,7 +320,8 @@ async function start() {
       f.gmat.visible = alive > 0.02;
     }
 
-    if (t < SEP[1]) setCaption("El cuadro cobra vida…");
+    if (vitrina) setCaption("Mostrando la profundidad… (vuelve solo al AR)");
+    else if (t < SEP[1]) setCaption("El cuadro cobra vida…");
     else setCaption(lit
       ? "La Virgen se adelanta · mueve tu celular alrededor · toca para apagar las velas"
       : "Velas apagadas · toca para encenderlas");
