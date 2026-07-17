@@ -292,7 +292,7 @@ async function start() {
 
     if (t < SEP[1]) setCaption("El cuadro cobra vida…");
     else setCaption(lit
-      ? "La Virgen se adelanta · mueve el celular para ver la profundidad · toca para apagar las velas"
+      ? "La Virgen se adelanta · mueve tu celular alrededor · toca para apagar las velas"
       : "Velas apagadas · toca para encenderlas");
 
     renderer.render(scene, camera);
