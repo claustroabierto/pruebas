@@ -33,11 +33,12 @@ window.MUSEO_CONFIG = {
     { key: "velas",  src: "assets/velas.webp",  z: 0.42 }
   ],
 
-  // Llamas procedurales sobre la mecha de cada cirio. Posiciones calibradas
-  // visualmente contra el asset de velas (la medición automática por color
-  // agarraba craquelado del borde; el ojo sobre la llama real fue más fiable).
+  // Llamas procedurales sobre la punta de cada cirio. Coordenadas LOCALES del
+  // plano de velas: las llamas son HIJAS de esa capa, así heredan su posición,
+  // escala y profundidad en toda la animación y quedan siempre pegadas a la
+  // mecha. Detectadas automáticamente (punta de la barra de cera de cada cirio).
   flames: [
-    { x: -0.350, y: 0.115 },
-    { x:  0.315, y: 0.122 }
+    { x: -0.418, y: 0.042 },
+    { x:  0.398, y: 0.049 }
   ]
 };

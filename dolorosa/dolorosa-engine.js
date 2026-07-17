@@ -113,9 +113,14 @@ async function start() {
     anchor.group.add(mesh);
     return { key: cfg.key, mesh, mat, z: cfg.z || 0, salida: cfg.salida || 0, col: new THREE.Color() };
   });
-  const velasZ = (layers.find((l) => l.key === "velas") || {}).z || 0.42;
+  const velasLayer = layers.find((l) => l.key === "velas");
+  const velasMesh = velasLayer ? velasLayer.mesh : anchor.group;
 
   // --- Llamas procedurales + glow (additive) ---
+  // Se parentan al PLANO DE VELAS (no al anchor): así heredan su posición,
+  // escala y profundidad durante toda la animación y quedan siempre pegadas a
+  // la mecha, sin importar la separación. Coordenadas de config = espacio local
+  // de ese plano (ancho 1, x∈[-0.5,0.5]).
   const flames = (CFG.flames || []).map((f, i) => {
     const uniforms = { uTime: { value: 0 }, uSeed: { value: i * 3.17 + 0.5 }, uAlive: { value: 0 } };
     const fmat = new THREE.ShaderMaterial({
@@ -123,9 +128,9 @@ async function start() {
       transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false
     });
     const fmesh = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.22), fmat);
-    fmesh.position.set(f.x, f.y + 0.02, velasZ + 0.02);
+    fmesh.position.set(f.x, f.y + 0.03, 0.02);   // local; +0.03 → la base nace en la punta
     fmesh.renderOrder = 20;
-    anchor.group.add(fmesh);
+    velasMesh.add(fmesh);
 
     // Glow: halo radial cálido que late (da la luz que "baña" alrededor).
     const gmat = new THREE.SpriteMaterial({
@@ -133,10 +138,10 @@ async function start() {
       blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, opacity: 0.0
     });
     const glow = new THREE.Sprite(gmat);
-    glow.position.set(f.x, f.y, velasZ + 0.015);
+    glow.position.set(f.x, f.y + 0.01, 0.015);
     glow.scale.set(0.24, 0.24, 1);
     glow.renderOrder = 19;
-    anchor.group.add(glow);
+    velasMesh.add(glow);
 
     return { uniforms, fmat, gmat, glow };
   });
