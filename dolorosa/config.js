@@ -43,14 +43,14 @@ window.MUSEO_CONFIG = {
   // escala y profundidad en toda la animación y quedan siempre pegadas a la
   // mecha. Detectadas automáticamente (punta de la barra de cera de cada cirio).
   flames: [
-    { x: -0.428, y: 0.043 },
-    { x:  0.386, y: 0.048 }
+    { x: -0.438, y: 0.043 },
+    { x:  0.382, y: 0.048 }
   ],
 
   // Ajuste fino del fuego (tunear con `ajuste.html`, no a ojo). flameYOffset =
   // cuánto sube la llama sobre la punta · flameScale = tamaño · flameZ =
   // profundidad local (0 = pegada al plano de la punta, mejor al ver de lado).
-  flameYOffset: 0.03,
+  flameYOffset: 0.026,
   flameScale: 1.0,
-  flameZ: 0.002
+  flameZ: -0.004
 };
