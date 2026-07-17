@@ -1,4 +1,4 @@
-/*  CONFIG DE PIEZA — Inmaculada_Concepción
+/*  CONFIG DE PIEZA — Inmaculada_Concepcion
  *  Análisis de microscopía (versión corregida del equipo, 2026-07-17). Las 8
  *  microscopías se revelan UNA POR UNA sobre el cuadro; cada recorte ya trae su
  *  ETIQUETA y su FLECHA (líneas blancas del "sin target", NO se inventan). Al
@@ -9,7 +9,7 @@
  *  alineados. Los `hotspots` son los círculos tocables (misma posición).
  */
 window.MUSEO_CONFIG = {
-  id: "Inmaculada_Concepción",
+  id: "Inmaculada_Concepcion",
   titulo: "La Inmaculada Concepción",
   subtitulo: "Microscopía y materialidad · pigmentos",
   ficha: "Óleo sobre lienzo · Escuela colonial · Análisis científico de pigmentos",
