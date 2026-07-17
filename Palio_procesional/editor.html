@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>Palio · posicionar los bichos</title>
+<style>:root{font-family:system-ui,sans-serif}*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#0d0b12;color:#f4efe6;overflow:hidden;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hint{position:fixed;left:0;right:0;top:0;z-index:5;text-align:center;padding:8px 12px;font-size:12px;opacity:.9;background:linear-gradient(#000c,#0000);pointer-events:none}
+#hint b{color:#c9a24b}
+#pill{position:fixed;left:8px;top:40px;z-index:6;background:#171320ee;border:1px solid #ffffff22;border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.5;font-variant-numeric:tabular-nums}
+#pill .v{color:#c9a24b;font-weight:700}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px;background:#0b0910ee;border-top:1px solid #ffffff22}
+.bar button{pointer-events:auto;background:#221c30;color:#f4efe6;border:1px solid #ffffff33;border-radius:8px;padding:9px 11px;font-size:13px;min-width:42px}
+.bar button:active{background:#3a2f52}
+.bar .wide{min-width:92px}
+.grp{display:flex;gap:4px;align-items:center;background:#00000033;border-radius:8px;padding:3px}
+.grp small{opacity:.7;padding:0 4px}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head><body>
+<canvas id="c"></canvas>
+<div id="hint">Toca un <b>bicho</b> para elegirlo · arrástralo a su sitio · <b>+ / −</b> tamaño · <b>Copiar</b> al terminar</div>
+<div id="pill">bicho <span class="v" id="pi">–</span>/15<br>x <span class="v" id="px">–</span> · y <span class="v" id="py">–</span><br>size <span class="v" id="ps">–</span></div>
+<div class="bar">
+  <button id="prev">◀ ant</button><button id="next">sig ▶</button>
+  <div class="grp"><small>tamaño</small><button data-k="s" data-d="-1">−</button><button data-k="s" data-d="1">+</button></div>
+  <button id="reset" class="wide">↺ Original</button>
+  <button id="copy" class="wide">⧉ Copiar</button>
+</div>
+<script src="config.js"></script>
+<script type="module">
+import * as THREE from "three";
+const CFG=window.MUSEO_CONFIG;
+const R=CFG.mantonReg||{x:0,y:0,size:1};
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const canvas=document.getElementById("c");
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,0.01,100);
+let VW=1,VH=1;
+function resize(){renderer.setSize(innerWidth,innerHeight);const a=innerWidth/innerHeight;camera.aspect=a;camera.updateProjectionMatrix();
+  const need=1.18;const halfV=Math.tan(THREE.MathUtils.degToRad(40)/2);
+  const dz=(a>=1? need/2/(halfV*a):need/2/halfV);camera.position.set(0,0,Math.max(1.4,dz));camera.lookAt(0,0,0);
+  VH=2*halfV*camera.position.z;VW=VH*a;}
+addEventListener("resize",resize);resize();
+const loader=new THREE.TextureLoader();const tx=s=>{const t=loader.load(s);t.colorSpace=THREE.SRGBColorSpace;return t;};
+// mantón limpio de fondo (donde se posan los bichos)
+const fv=CFG.fondoVacio;
+const manton=new THREE.Mesh(new THREE.PlaneGeometry(R.size,R.size/(fv?fv.aspect:CFG.aspect)),
+  new THREE.MeshBasicMaterial({map:tx(fv?fv.src:CFG.targetPreview),depthTest:false,depthWrite:false}));
+manton.position.set(R.x,R.y,0);manton.renderOrder=0;scene.add(manton);
+// bichos (estáticos, para posicionar)
+const B=CFG.bichos.map((b,i)=>{
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
+    new THREE.MeshBasicMaterial({map:tx(b.src),transparent:true,depthTest:false,depthWrite:false}));
+  mesh.renderOrder=2+i;scene.add(mesh);
+  return {x:b.x,y:b.y,size:b.size,aspect:b.aspect,mesh};
+});
+const START=B.map(b=>({x:b.x,y:b.y,size:b.size}));
+// aro de selección
+const ring=new THREE.Mesh(new THREE.RingGeometry(0.5,0.56,40),
+  new THREE.MeshBasicMaterial({color:0xffd24b,transparent:true,opacity:0.95,side:THREE.DoubleSide,depthTest:false}));
+ring.renderOrder=50;ring.visible=false;scene.add(ring);
+let sel=0;
+function drawAll(){for(const b of B){b.mesh.position.set(b.x,b.y,0.01);b.mesh.scale.set(b.size*b.aspect,b.size,1);}
+  const b=B[sel];if(b){ring.visible=true;const r=Math.max(b.size*b.aspect,b.size)*0.62;ring.position.set(b.x,b.y,0.02);ring.scale.set(r/0.53,r/0.53,1);}
+  document.getElementById("pi").textContent=sel+1;
+  document.getElementById("px").textContent=B[sel].x.toFixed(3);
+  document.getElementById("py").textContent=B[sel].y.toFixed(3);
+  document.getElementById("ps").textContent=B[sel].size.toFixed(3);}
+drawAll();
+renderer.setAnimationLoop(()=>renderer.render(scene,camera));
+// pantalla -> mundo (cámara centrada mirando -Z)
+function worldAt(px,py){return {x:((px/innerWidth)*2-1)*VW/2, y:(-(py/innerHeight)*2+1)*VH/2};}
+function pick(px,py){const w=worldAt(px,py);let best=-1,bd=1e9;
+  for(let i=B.length-1;i>=0;i--){const b=B[i];const hw=b.size*b.aspect/2,hh=b.size/2;
+    if(Math.abs(w.x-b.x)<hw&&Math.abs(w.y-b.y)<hh){return i;}         // dentro del bicho
+    const d=Math.hypot(w.x-b.x,w.y-b.y);if(d<bd){bd=d;best=i;}}
+  return bd<0.08?best:-1;}
+let drag=false;
+canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);
+  const i=pick(e.clientX,e.clientY);if(i>=0){sel=i;drag=true;}drawAll();});
+canvas.addEventListener("pointermove",e=>{if(!drag)return;const w=worldAt(e.clientX,e.clientY);
+  B[sel].x=clamp(w.x,-0.6,0.6);B[sel].y=clamp(w.y,-0.6,0.6);drawAll();});
+const up=()=>drag=false;canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",up);
+canvas.addEventListener("wheel",e=>{e.preventDefault();B[sel].size=clamp(B[sel].size*(1-e.deltaY*0.0015),0.03,0.4);drawAll();},{passive:false});
+document.querySelectorAll(".bar button[data-k]").forEach(b=>b.addEventListener("click",()=>{
+  B[sel].size=clamp(B[sel].size+ (+b.dataset.d)*0.006,0.03,0.4);drawAll();}));
+document.getElementById("prev").addEventListener("click",()=>{sel=(sel+B.length-1)%B.length;drawAll();});
+document.getElementById("next").addEventListener("click",()=>{sel=(sel+1)%B.length;drawAll();});
+document.getElementById("reset").addEventListener("click",()=>{B.forEach((b,i)=>{b.x=START[i].x;b.y=START[i].y;b.size=START[i].size;});drawAll();});
+const copyBtn=document.getElementById("copy");let ct=0;
+copyBtn.addEventListener("click",async()=>{
+  const f=v=>(+v).toFixed(3).replace(/\.?0+$/,'')||'0';
+  const lines=CFG.bichos.map((b,i)=>`    { src: "${b.src}", aspect: ${b.aspect}, x: ${(+B[i].x.toFixed(3))}, y: ${(+B[i].y.toFixed(3))}, size: ${(+B[i].size.toFixed(3))}, spread: ${b.spread}, flap: ${b.flap} }`).join(",\n");
+  const txt=`bichos: [\n${lines}\n  ]`;
+  try{await navigator.clipboard.writeText(txt);}catch{const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();}
+  copyBtn.textContent="✓ copiado";clearTimeout(ct);ct=setTimeout(()=>copyBtn.textContent="⧉ Copiar",1500);
+});
+</script>
+</body></html>

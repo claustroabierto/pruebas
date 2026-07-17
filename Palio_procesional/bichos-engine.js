@@ -18,6 +18,7 @@ import { MindARThree } from "mindar-image-three";
 const CFG = window.MUSEO_CONFIG;
 const $ = (id) => document.getElementById(id);
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (a, b, t) => { const x = clamp01((t - a) / (b - a)); return x * x * (3 - 2 * x); };
 const lerp = (a, b, t) => a + (b - a) * t;
 
@@ -69,24 +70,32 @@ async function start() {
     return { ...b, mesh, mat, ph: i * 1.7, fx: 0.33 + i * 0.028, fy: 0.26 + i * 0.022, cur: null };
   });
 
-  // Emergen DESDE EL CENTRO: nacen diminutos en (0,0), crecen y vuelan a su sitio,
-  // y ahí revolotean/aletean. mt = tiempo desde que se detectó la obra.
+  // Emergen DESDE EL CENTRO: nacen diminutos en (0,0), salen en ABANICO (arco) a
+  // su sitio, y ahí vagabundean/aletean en bucle. mt = tiempo desde la detección.
   function trans(b, i, now, mt) {
     const stg = i * 0.14;
     const grow = smooth(stg, stg + 1.2, mt);          // tamaño 0 → 1
     const out  = smooth(stg + 0.15, stg + 1.7, mt);   // sale del centro 0 → 1
-    const move = smooth(stg + 1.5, stg + 2.5, mt);    // empieza a revolotear
+    const move = smooth(stg + 1.5, stg + 2.5, mt);    // empieza a vagabundear
     const baseScale = b.size * (0.02 + 0.98 * grow);
     const sx = baseScale * b.aspect;
-    const bx = lerp(0, b.x, out), by = lerp(0, b.y, out);
+    // trayectoria recta desde el centro + un ARCO perpendicular que pica a mitad
+    // de vuelo (los bichos se abren en abanico, no en línea).
+    const bx0 = lerp(0, b.x, out), by0 = lerp(0, b.y, out);
+    const nrm = Math.hypot(b.x, b.y) || 1;
+    const arc = Math.sin(out * Math.PI) * 0.09 * (i % 2 ? 1 : -1);
+    const ax = -b.y / nrm * arc, ay = b.x / nrm * arc;
+    // vagabundeo orgánico: dos frecuencias (no mecánico) alrededor del sitio.
     const amp = b.spread * (mode === "enjambre" ? 1.0 : 0.42);
-    const ox = Math.sin(now * b.fx + b.ph) * amp * move;
-    const oy = (Math.sin(now * b.fy + b.ph * 1.3) * amp * 0.55 + Math.sin(now * 1.1 + b.ph) * 0.012) * move;
+    const ox = (Math.sin(now * b.fx + b.ph) * 0.72 + Math.sin(now * b.fx * 0.43 + b.ph * 2.1) * 0.28) * amp * move;
+    const oy = (Math.sin(now * b.fy + b.ph * 1.3) * 0.6 + Math.sin(now * b.fy * 0.37 + b.ph) * 0.22) * amp * 0.75 * move;
     const flapv = Math.sin(now * b.flap + b.ph);
     const sy = baseScale * (1 + flapv * 0.14 * (0.35 + 0.65 * move));
-    const rot = Math.sin(now * 0.6 + b.ph) * 0.18 * move + flapv * 0.025;
+    // banqueo: se inclina según hacia dónde se mueve + micro-aleteo.
+    const vx = Math.cos(now * b.fx + b.ph) * b.fx;
+    const rot = -clamp(vx * 0.22, -0.28, 0.28) * move + flapv * 0.03;
     const z = 0.02 + move * (0.05 + 0.03 * Math.sin(now * b.fx + b.ph));
-    return { x: bx + ox, y: by + oy, z, sx, sy, rot };
+    return { x: bx0 + ax + ox, y: by0 + ay + oy, z, sx, sy, rot };
   }
 
   // --- Estado ---
