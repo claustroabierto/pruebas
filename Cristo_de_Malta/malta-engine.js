@@ -72,6 +72,35 @@ async function start() {
   const anchor = mindar.addAnchor(0);
   const loader = new THREE.TextureLoader();
 
+  // --- Etiquetas de texto (negro con halo blanco) sobre un plano ---
+  // Se generan a partir de un canvas para no depender de assets ni fuentes web.
+  function makeLabelTex(text, size = 130) {
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    const font = `800 ${size}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+    ctx.font = font;
+    const pad = size * 0.55;
+    c.width = Math.ceil(ctx.measureText(text).width) + pad * 2;
+    c.height = Math.ceil(size + pad);
+    ctx.font = font; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(255,255,255,0.96)"; ctx.lineWidth = size * 0.24;  // halo para leerse en cualquier fondo
+    ctx.strokeText(text, c.width / 2, c.height / 2);
+    ctx.fillStyle = "#111"; ctx.fillText(text, c.width / 2, c.height / 2);    // letra negra
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+    return { tex, aspect: c.width / c.height };
+  }
+  // Devuelve un mesh de etiqueta de ancho `w` (unidades del padre); su alto sale
+  // del aspecto del texto. Arranca invisible (la opacidad la maneja el loop).
+  function makeLabel(text, w) {
+    const { tex, aspect } = makeLabelTex(text);
+    const h = w / aspect;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthTest: false, depthWrite: false }));
+    mesh.renderOrder = 30;
+    return { mesh, h };
+  }
+
   // --- Construcción de las tres capas ---
   const layers = CFG.layers.map((cfg, i) => {
     const tex = loader.load(cfg.src);
@@ -83,8 +112,14 @@ async function start() {
     });
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, h), mat);
     anchor.group.add(mesh);
+    // Etiqueta DEBAJO de la imagen, hija del plano → hereda posición y escala
+    // (se mueve al costado y CRECE/decrece junto con su figura).
+    const etq = makeLabel(cfg.etiqueta || cfg.titulo, 0.62);
+    etq.mesh.position.set(0, -h / 2 - 0.02 - etq.h / 2, 0.003);
+    mesh.add(etq.mesh);
     const layer = {
       key: cfg.key, mesh, mat, titulo: cfg.titulo, desc: cfg.desc,
+      label: etq.mesh,          // etiqueta negra pegada a la imagen
       slot: cfg.slot,           // dónde termina en la intro
       order: i,                 // orden de aparición (z relativo)
       cur: { x: 0, y: 0, s: 1 },// pose actual (se escribe cada frame)
@@ -94,6 +129,11 @@ async function start() {
     mesh.userData.layer = layer;
     return layer;
   });
+
+  // Título FIJO arriba (no se mueve con las capas): "IMAGEN CIENTÍFICA".
+  const topLabel = makeLabel("IMAGEN CIENTÍFICA", 0.72);
+  topLabel.mesh.position.set(0, 0.72, 0.02);
+  anchor.group.add(topLabel.mesh);
   const byKey = (k) => layers.find((l) => l.key === k);
 
   function applyPose(l) {
@@ -102,6 +142,7 @@ async function start() {
     l.mat.opacity = l.op;
     l.mesh.renderOrder = (l.slot === "center") ? 10 : l.order;
     l.mesh.visible = l.op > 0.001;
+    if (l.label) { l.label.material.opacity = l.op; l.label.visible = l.op > 0.001; }
   }
 
   // --- Estado / fases ---
@@ -230,6 +271,10 @@ async function start() {
     if (phase === "intro") intro(clock.getElapsedTime() - startT);
     else if (phase === "interactive") interactive();
     layers.forEach(applyPose);
+    // Título fijo: aparece con la primera imagen y se mantiene.
+    const mo = layers.reduce((m, l) => Math.max(m, l.op), 0);
+    topLabel.mesh.material.opacity = mo;
+    topLabel.mesh.visible = mo > 0.001;
     renderer.render(scene, camera);
   });
 }

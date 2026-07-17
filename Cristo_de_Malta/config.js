@@ -33,6 +33,7 @@ window.MUSEO_CONFIG = {
       aspect: 0.7669,
       slot: "left",
       titulo: "Infrarrojo",
+      etiqueta: "LUZ INFRARROJA",   // label negro DEBAJO de la imagen (crece/se mueve con ella)
       desc: "Aflora el dibujo subyacente: las líneas con que el pintor trazó el Cristo antes de pintarlo."
     },
     {
@@ -41,6 +42,7 @@ window.MUSEO_CONFIG = {
       aspect: 0.7753,
       slot: "right",
       titulo: "Ultravioleta",
+      etiqueta: "LUZ ULTRAVIOLETA",
       desc: "Revela barnices y retoques en la superficie: dónde y cuándo se intervino la obra."
     },
     {
@@ -49,6 +51,7 @@ window.MUSEO_CONFIG = {
       aspect: 0.7669,
       slot: "center",
       titulo: "Rayos X",
+      etiqueta: "RAYOS X",
       desc: "Bajo el Cristo hay otra pintura: una Virgen que fue cubierta y quedó oculta durante siglos."
     }
   ]
