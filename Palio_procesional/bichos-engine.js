@@ -101,7 +101,7 @@ async function start() {
 
   // --- Estado ---
   let mode = "revolotea", visible = false, lastTap = -1, startT = 0;
-  let uvOn = false, uvMix = 0, micOn = false, micMix = 0;
+  let uvOn = false, uvMix = 0, micOn = false, micMix = 0, overlayMix = 0;
   const clock = new THREE.Clock();
   const setCaption = (t) => { $("caption").textContent = t || ""; };
   const normalCap = () => (mode === "enjambre"
@@ -159,11 +159,14 @@ async function start() {
   renderer.setAnimationLoop(() => {
     const now = clock.getElapsedTime();
     const mt = now - startT;
-    uvMix = lerp(uvMix, uvOn ? 1 : 0, 0.1);
-    micMix = lerp(micMix, micOn ? 1 : 0, 0.1);
+    uvMix = lerp(uvMix, uvOn ? 1 : 0, 0.12);
+    micMix = lerp(micMix, micOn ? 1 : 0, 0.12);
+    // "overlayMix" = 1 mientras haya UV o micro. Al pasar de UV a micro se mantiene
+    // en 1 (uvOn||micOn sigue true), así los bichos NO parpadean en el cruce.
+    overlayMix = lerp(overlayMix, (uvOn || micOn) ? 1 : 0, 0.14);
     if (uvOv) { uvOv.mat.opacity = uvMix; uvOv.mesh.visible = uvMix > 0.01; }
     if (micOv) { micOv.mat.opacity = micMix; micOv.mesh.visible = micMix > 0.01; }
-    const bichosVis = Math.max(0, 1 - Math.max(uvMix, micMix));   // se ocultan en UV/micro
+    const bichosVis = Math.max(0, 1 - overlayMix);   // ocultos si hay UV o micro (sin parpadeo)
     for (let i = 0; i < bichos.length; i++) {
       const b = bichos[i], t = trans(b, i, now, mt);
       if (!b.cur) b.cur = { ...t };
