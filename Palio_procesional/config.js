@@ -22,9 +22,10 @@ window.MUSEO_CONFIG = {
   fondo: "assets/manton.webp",   // solo para la demo sin cámara
   aspect: 1.462,
 
-  // Overlays de mantón completo (los tres comparten registro; vienen de la misma foto).
-  mantonReg:   { x: 0.0, y: 0.0, size: 1.0, rot: 0.0 },
-  fondoVacio:  { src: "assets/fondo-vacio.webp",  aspect: 1.365 },
+  // El UV usa su propio registro (ajustado a mano con uv.html: mover/escalar/GIRAR
+  // porque su foto está en otro ángulo). La microscopía va SIN rotación, centrada.
+  mantonReg:   { x: -0.036, y: -0.024, size: 0.959, rot: 0.0419 },   // solo UV
+  microReg:    { x: 0.0, y: 0.0, size: 1.0, rot: 0.0 },              // microscopía tal cual
   uvManton:    { src: "assets/uv-manton.webp",    aspect: 1.389 },
   microManton: { src: "assets/micro-manton.webp?v=2", aspect: 1.389 },
 

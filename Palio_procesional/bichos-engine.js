@@ -49,9 +49,9 @@ async function start() {
 
   // --- Overlays de mantón completo (fondo limpio, UV, microscopía) ---
   // Los tres comparten registro (misma foto). `size` = ancho en unidades del mantón.
-  const R = CFG.mantonReg || { x: 0, y: 0, size: 1 };
-  function makeOverlay(cfg, z, ro) {
+  function makeOverlay(cfg, z, ro, reg) {
     if (!cfg) return null;
+    const R = reg || { x: 0, y: 0, size: 1, rot: 0 };
     const mat = new THREE.MeshBasicMaterial({ map: tex(cfg.src), transparent: true, opacity: 0, depthTest: false, depthWrite: false });
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(R.size, R.size / cfg.aspect), mat);
     mesh.position.set(R.x, R.y, z); mesh.rotation.z = R.rot || 0; mesh.renderOrder = ro; mesh.visible = false;
@@ -59,9 +59,9 @@ async function start() {
     return { mesh, mat };
   }
   // NO se superpone el mantón: la base es la obra real (cámara). Solo se muestran,
-  // uno a la vez, los bichos O el UV O la microscopía.
-  const uvOv  = makeOverlay(CFG.uvManton, 0.05, 20);     // encima de los bichos
-  const micOv = makeOverlay(CFG.microManton, 0.06, 21);
+  // uno a la vez, los bichos O el UV O la microscopía. Cada overlay con su registro.
+  const uvOv  = makeOverlay(CFG.uvManton, 0.05, 20, CFG.mantonReg);     // UV: registro ajustado (con giro)
+  const micOv = makeOverlay(CFG.microManton, 0.06, 21, CFG.microReg);  // micro: centrado, sin giro
 
   // --- Insectos (nacen en el centro y vuelan a su sitio) ---
   const bichos = CFG.bichos.map((b, i) => {
