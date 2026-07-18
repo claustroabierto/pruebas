@@ -49,17 +49,18 @@ async function start() {
     g.fillStyle = gr; g.fillRect(0, 0, s, s);
     const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t;
   }
-  // --- Etiqueta de texto (negro con leve halo) para las comparativas ---
-  function makeLabel(text, w) {
-    const size = 90, c = document.createElement("canvas"), ctx = c.getContext("2d");
-    const font = `700 ${size}px system-ui, "Segoe UI", sans-serif`;
+  // --- Etiqueta de texto en ARIAL (color configurable + leve halo para leerse) ---
+  function makeLabel(text, w, color) {
+    color = color || "#eafff0";
+    const size = 96, c = document.createElement("canvas"), ctx = c.getContext("2d");
+    const font = `700 ${size}px Arial, "Helvetica Neue", Helvetica, sans-serif`;
     ctx.font = font; const pad = size * 0.5;
     c.width = Math.ceil(ctx.measureText(text).width) + pad * 2; c.height = size + pad;
     ctx.font = font; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.lineJoin = "round"; ctx.strokeStyle = "rgba(0,0,0,0.85)"; ctx.lineWidth = size * 0.16;
+    ctx.lineJoin = "round"; ctx.strokeStyle = "rgba(0,0,0,0.85)"; ctx.lineWidth = size * 0.14;
     ctx.strokeText(text, c.width/2, c.height/2);
-    ctx.fillStyle = "#eafff0"; ctx.fillText(text, c.width/2, c.height/2);
-    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+    ctx.fillStyle = color; ctx.fillText(text, c.width/2, c.height/2);
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     const h = w * c.height / c.width;
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
       new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthTest: false, depthWrite: false }));
@@ -90,6 +91,12 @@ async function start() {
     lab.position.set(c.x, c.y - c.size / c.aspect / 2 - 0.06, 0.03); anchor.group.add(lab);
     return { m, lab, y: c.y };
   });
+
+  // --- Título de la pieza (Arial, MAYÚSCULAS, color del equipo) arriba, fijo ---
+  const L = CFG.label || { text: "REFLEXIÓN POR RADIACIÓN DE LUZ UV", color: "#eafff0" };
+  const title = makeLabel((L.text || "").toUpperCase(), L.width || 1.15, L.color);
+  title.position.set(0, (o.size / o.aspect) * 0.5 + 0.12, 0.05);   // arriba del candelabro
+  anchor.group.add(title);
 
   const DARK = new THREE.Color(0.16, 0.20, 0.16);   // candelabro "apagado" (antes del UV)
   const setCaption = (t) => { $("caption").textContent = t || ""; };
@@ -130,7 +137,8 @@ async function start() {
     const gs = pulse; glow.scale.set(o.size * 1.7 * gs, H * 1.15 * gs, 1);
     shadow.material.opacity = appear * 0.45;
     shadow.position.set(0, -H * 0.52 + bob * 0.5, 0.02);
-    // comparativas
+    // título + comparativas
+    title.material.opacity = appear;
     for (const c of comps) { const op = step(1.4, 2.2, t) * (visible ? 1 : 0); c.m.material.opacity = op; c.lab.material.opacity = op; }
 
     setCaption(t < 0.9 ? "El candelabro sale del marcador…"

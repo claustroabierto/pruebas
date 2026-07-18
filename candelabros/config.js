@@ -16,8 +16,12 @@ window.MUSEO_CONFIG = {
   targetSrc: "assets/targets.mind",
   targetPreview: "assets/marcador.jpg",
 
+  // Título de la pieza (Arial, se muestra en MAYÚSCULAS). `color` = el que definió
+  // el equipo — PLACEHOLDER, cambiar por el hex exacto que pasen.
+  label: { text: "Reflexión por radiación de luz UV", color: "#eafff0", width: 1.15 },
+
   // El candelabro UV (recorte transparente) que sale del marcador y se enciende.
-  objeto: { src: "assets/overlay.webp", aspect: 0.541, size: 0.9 },
+  objeto: { src: "assets/overlay.webp?v=2", aspect: 0.541, size: 0.9 },
 
   // Comparativas del cristal (sin / con luz UV) a los costados.
   comparativas: [
