@@ -138,7 +138,7 @@ copyBtn.addEventListener("click", async () => {
   const f = v => +(+v).toFixed(3);
   const one = (id, c) => '{ src: "' + c.src + '", aspect: ' + c.aspect + ', width: ' + f(P[id].w) + ', x: ' + f(P[id].x) + ', y: ' + f(P[id].y) + ' }';
   const micLines = CFG.microscopias.map((m, i) =>
-    '    { src: "' + m.src + '", aspect: ' + m.aspect + ', width: ' + f(P["mic" + i].w) + ', x: ' + f(P["mic" + i].x) + ', y: ' + f(P["mic" + i].y) +
+    '    { src: "' + m.src + '", zoom: "' + m.zoom + '", aspect: ' + m.aspect + ', width: ' + f(P["mic" + i].w) + ', x: ' + f(P["mic" + i].x) + ', y: ' + f(P["mic" + i].y) +
     ', titulo: "' + m.titulo + '", pigmento: "' + m.pigmento + '", formula: "' + m.formula + '", nota: "' + m.nota + '" }').join(",\n");
   const txt = "rx: " + one("rx", CFG.rx) + ",\n" +
     'reversoOval: { src: "' + O.src + '", aspect: ' + O.aspect + ', width: ' + f(P.reversoOval.w) +

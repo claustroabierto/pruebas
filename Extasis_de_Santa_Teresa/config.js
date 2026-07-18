@@ -41,8 +41,10 @@ window.MUSEO_CONFIG = {
   microTitulo: { src: "assets/micro-titulo.webp", aspect: 6.255, width: 0.60, x: 0.85, y: 0.656 },
   intervaloReveal: 0.8,
   microscopias: [
-    { src: "assets/micro-dorado.webp",    aspect: 1.920, width: 0.62, x: 0.92, y:  0.41, titulo: "Dorado",    pigmento: "Oro",     formula: "Au",             nota: "Detalles en pan de oro (Au); en el rayos X aparecen opacos." },
-    { src: "assets/micro-carnacion.webp", aspect: 1.851, width: 0.62, x: 0.92, y:  0.00, titulo: "Carnación", pigmento: "Plomo",   formula: "Pb",             nota: "La carnación se construye con blanco de plomo (Pb)." },
-    { src: "assets/micro-azurita.webp",   aspect: 1.817, width: 0.62, x: 0.92, y: -0.41, titulo: "Azurita",   pigmento: "Azurita", formula: "Cu₃(CO₃)₂(OH)₂", nota: "Azul mineral de azurita, carbonato básico de cobre." }
+    // `src` = tarjeta del análisis (con su texto) que se ve en el AR.
+    // `zoom` = la foto INDIVIDUAL original (sin texto), que es la que se amplía al tocar.
+    { src: "assets/micro-dorado.webp",    zoom: "assets/zoom-dorado.webp",    aspect: 1.920, width: 0.62, x: 0.92, y:  0.41, titulo: "Dorado",    pigmento: "Oro",     formula: "Au",             nota: "Detalles en pan de oro (Au); en el rayos X aparecen opacos." },
+    { src: "assets/micro-carnacion.webp", zoom: "assets/zoom-carnacion.webp", aspect: 1.851, width: 0.62, x: 0.92, y:  0.00, titulo: "Carnación", pigmento: "Plomo",   formula: "Pb",             nota: "La carnación se construye con blanco de plomo (Pb)." },
+    { src: "assets/micro-azurita.webp",   zoom: "assets/zoom-azurita.webp",   aspect: 1.817, width: 0.62, x: 0.92, y: -0.41, titulo: "Azurita",   pigmento: "Azurita", formula: "Cu₃(CO₃)₂(OH)₂", nota: "Azul mineral de azurita, carbonato básico de cobre." }
   ]
 };

@@ -76,7 +76,8 @@ async function start() {
     $("card-pigmento").textContent = m.pigmento || "";
     $("card-formula").textContent = m.formula || "";
     $("card-nota").textContent = m.nota || "";
-    const img = $("card-img"); if (img) { img.src = m.src; img.style.display = "block"; }
+    // en la tarjeta/zoom va la foto INDIVIDUAL (sin el texto del análisis)
+    const img = $("card-img"); if (img) { img.src = m.zoom || m.src; img.style.display = "block"; }
     $("card").classList.add("on");
   }
   function closeCard() { $("card").classList.remove("on"); const z = $("zoom"); if (z) z.classList.remove("on"); }
