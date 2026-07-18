@@ -14,7 +14,7 @@ window.MUSEO_CONFIG = {
   ficha: "Vidrio con contenido de uranio · fluoresce verde bajo radiación UV · target: marcador RA2",
 
   targetSrc: "assets/targets.mind",
-  targetPreview: "assets/marcador.jpg",
+  targetPreview: "assets/marcador.png",   // marcador RA2 real (letras) — probado: detecta a ~0.5 m (chico) / ~1 m (grande)
 
   // Título de la pieza (Arial, se muestra en MAYÚSCULAS). `color` = el que definió
   // el equipo — PLACEHOLDER, cambiar por el hex exacto que pasen.
