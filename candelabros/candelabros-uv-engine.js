@@ -114,11 +114,12 @@ async function start() {
   $("loading").style.display = "none";
 
   // Suavizado del pose: el marcador RA2 es débil (pocas features) → el tracking
-  // tiembla y la escala oscila. Interpolamos posición/rotación/escala del anchor
-  // hacia el valor rastreado (menos jitter, con un poco de lag — aceptable porque
-  // el candelabro FLOTA, no calza pixel a pixel).
+  // tiembla y la ESCALA oscila (agrande/achique = ruido en la distancia Z). Se
+  // suaviza SOLO la POSICIÓN; la rotación y la escala van CRUDAS (si se suaviza la
+  // rotación, se atrasa y el plano se "chuequea"). Así baja el temblor/agrande sin
+  // torcerse. Un poco de lag de traslación es aceptable porque el candelabro flota.
   const _p = new THREE.Vector3(), _q = new THREE.Quaternion(), _s = new THREE.Vector3();
-  const sp = new THREE.Vector3(), sq = new THREE.Quaternion(), ss = new THREE.Vector3();
+  const sp = new THREE.Vector3(), ss = new THREE.Vector3();
   let sInit = false;
 
   renderer.setAnimationLoop(() => {
@@ -126,9 +127,9 @@ async function start() {
     const t = now - startT;
     if (visible) {
       anchor.group.matrix.decompose(_p, _q, _s);
-      if (!sInit) { sp.copy(_p); sq.copy(_q); ss.copy(_s); sInit = true; }
-      else { sp.lerp(_p, 0.18); sq.slerp(_q, 0.18); ss.lerp(_s, 0.18); }
-      anchor.group.matrix.compose(sp, sq, ss);
+      if (!sInit) { sp.copy(_p); ss.copy(_s); sInit = true; }
+      else { sp.lerp(_p, 0.22); ss.lerp(_s, 0.22); }
+      anchor.group.matrix.compose(sp, _q, ss);   // rotación CRUDA → no se chuequea; posición+escala suavizadas
       anchor.group.matrixWorldNeedsUpdate = true;
     } else sInit = false;
     const appear = visible ? step(0.0, 0.6, t) : 0;     // sale del marcador
